@@ -1,5 +1,378 @@
-<html>
-  <body>
-    hello
-  </body>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教學工具整合版</title>
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--text:#1f2937;--muted:#64748b;--primary:#3a86ff;
+  --primary2:#2563eb;--danger:#e63946;--success:#16a34a;--warning:#f59e0b;
+  --border:#dbe3ee;--shadow:0 8px 25px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{border:0;border-radius:9px;padding:9px 13px;background:var(--primary);color:#fff;font-weight:700;cursor:pointer}
+button:hover{background:var(--primary2)}
+button.danger{background:var(--danger)} button.success{background:var(--success)}
+button.warn{background:var(--warning)} button.gray{background:#64748b}
+input,select,textarea{border:1px solid var(--border);border-radius:8px;padding:9px;background:#fff;color:var(--text)}
+textarea{resize:vertical}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#172554;color:#fff;padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{font-size:22px;font-weight:900;margin-bottom:18px}
+.nav button{display:block;width:100%;text-align:left;margin:6px 0;background:transparent}
+.nav button:hover,.nav button.active{background:#2563eb}
+.main{flex:1;padding:24px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}
+h1{margin:0;font-size:28px} h2{margin-top:0}
+.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tool-card{cursor:pointer;transition:.15s}.tool-card:hover{transform:translateY(-2px)}
+.tool-icon{font-size:35px}.tool-title{font-size:19px;font-weight:800;margin:8px 0}.muted{color:var(--muted)}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.row>*{max-width:100%}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{border:1px solid var(--border);padding:9px;text-align:center}
+th{background:#eff6ff}
+.timer-display{font:800 68px monospace;text-align:center;padding:20px;background:#eef2f7;border-radius:12px;margin:15px 0}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.exam-layout,.assignment-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+.blackboard{background:#0f3425;color:#fff;border:5px solid #5c3d2e;border-radius:12px;padding:20px;min-height:400px}
+.blackboard h3{text-align:center;color:#ffeb3b}.blackboard textarea{width:100%;height:320px;background:transparent;border:0;color:#fff;font-size:18px}
+.big-count{font:800 70px monospace;text-align:center;color:#00f5d4}
+.badge{display:inline-block;padding:5px 10px;border-radius:99px;color:#fff;font-weight:800;cursor:pointer}
+.yes{background:#16a34a}.no{background:#e63946}
+.status{padding:10px;border-radius:9px;background:#eff6ff;margin:10px 0}
+@media(max-width:800px){.sidebar{width:190px}.exam-layout,.assignment-layout{grid-template-columns:1fr}.timer-display{font-size:48px}}
+@media(max-width:600px){.app{display:block}.sidebar{position:static;width:100%;height:auto}.nav{display:grid;grid-template-columns:1fr 1fr}.main{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">🎓 教學工具</div>
+  <div class="nav">
+    <button onclick="showPage('home')" id="nav-home">🏠 首頁</button>
+    <button onclick="showPage('timer')" id="nav-timer">⏱️ 計時器</button>
+    <button onclick="showPage('students')" id="nav-students">🎒 學生管理及抽籤</button>
+    <button onclick="showPage('timetable')" id="nav-timetable">📅 課表</button>
+    <button onclick="showPage('exam')" id="nav-exam">🔔 考試</button>
+    <button onclick="showPage('assignment')" id="nav-assignment">📚 作業</button>
+    <button onclick="showPage('links')" id="nav-links">🔗 快速連結</button>
+  </div>
+</aside>
+
+<main class="main">
+<div class="topbar">
+  <h1 id="pageTitle">🏠 教學工具整合版</h1>
+  <div class="muted">💾 資料會自動儲存在本機瀏覽器</div>
+</div>
+
+<section id="home" class="page">
+  <div class="card">
+    <h2>教學工具總覽</h2>
+    <p class="muted">單一 HTML 整合版。學生管理與課表共用同一份「班級資料」，新增班級後兩邊會同步。</p>
+  </div>
+  <div class="grid">
+    <div class="card tool-card" onclick="showPage('timer')"><div class="tool-icon">⏱️</div><div class="tool-title">計時器</div><div class="muted">快捷時間、自訂時間、到時警報</div></div>
+    <div class="card tool-card" onclick="showPage('students')"><div class="tool-icon">🎒</div><div class="tool-title">學生管理及抽籤</div><div class="muted">班級、學生、加扣分、隨機抽籤</div></div>
+    <div class="card tool-card" onclick="showPage('timetable')"><div class="tool-icon">📅</div><div class="tool-title">課表</div><div class="muted">多班級、節次、週一至週五</div></div>
+    <div class="card tool-card" onclick="showPage('exam')"><div class="tool-icon">🔔</div><div class="tool-title">考試</div><div class="muted">考試倒數、規則公告、自動開始</div></div>
+    <div class="card tool-card" onclick="showPage('assignment')"><div class="tool-icon">📚</div><div class="tool-title">作業</div><div class="muted">繳交狀態與未交名單</div></div>
+    <div class="card tool-card" onclick="showPage('links')"><div class="tool-icon">🔗</div><div class="tool-title">快速連結</div><div class="muted">Canva、YouTube、教育部辭典</div></div>
+  </div>
+</section>
+
+<section id="timer" class="page">
+<div class="card">
+<h2>⏱️ 多功能計時器</h2>
+<div id="timerDisplay" class="timer-display">00:00:00</div>
+<div class="quick-grid">
+<button onclick="setQuickTime(1)">1 分鐘</button><button onclick="setQuickTime(3)">3 分鐘</button><button onclick="setQuickTime(5)">5 分鐘</button>
+<button onclick="setQuickTime(10)">10 分鐘</button><button onclick="setQuickTime(15)">15 分鐘</button><button onclick="setQuickTime(30)">30 分鐘</button>
+</div>
+<div class="row" style="margin-top:15px">
+<input type="number" id="th" min="0" value="0" placeholder="時">時
+<input type="number" id="tm" min="0" max="59" value="0" placeholder="分">分
+<input type="number" id="ts" min="0" max="59" value="0" placeholder="秒">秒
+<button class="success" onclick="setCustomTime()">設定</button>
+</div>
+<div class="row"><button id="timerStart" class="warn" onclick="toggleTimer()">開始</button><button class="gray" onclick="resetTimer()">重設</button></div>
+</div>
+</section>
+
+<section id="students" class="page">
+<div class="card">
+<h2>🎒 班級管理與加扣分系統</h2>
+<div class="status">🔄 <b>班級同步：</b>這裡建立/刪除的班級會同步到「課表」。課表也能使用這些班級。</div>
+<div class="row">
+<input id="classInput" placeholder="新班級，例如：五年二班"><button onclick="addClass()">➕ 新增班級</button>
+<select id="studentClassSelect" onchange="renderStudents()"></select>
+<input id="studentInput" placeholder="學生姓名"><button onclick="addStudent()">👤 新增學生</button>
+</div>
+<div class="card" style="background:#fff7e6;border:2px dashed #ff9f1c;text-align:center">
+<b>🎲 隨機抽籤</b><div id="luckyName" style="font-size:30px;font-weight:900;margin:10px;color:#d90429">準備抽籤...</div>
+<button class="warn" onclick="startLottery()">🎯 開始抽籤</button>
+</div>
+<table><thead><tr><th>班級</th><th>姓名</th><th>分數</th><th>操作</th></tr></thead><tbody id="studentTable"></tbody></table>
+<div class="row" style="margin-top:15px"><button onclick="exportStudents()">📤 匯出 CSV</button><label style="background:#8338ec;color:#fff;padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer">📥 匯入 CSV<input type="file" hidden accept=".csv" onchange="importStudents(event)"></label><button class="danger" onclick="clearStudents()">🗑️ 清空學生資料</button></div>
+</div>
+</section>
+
+<section id="timetable" class="page">
+<div class="card">
+<h2>📅 多班級自訂課表</h2>
+<div class="status">🔄 <b>班級同步：</b>班級清單與「學生管理」共用。選擇同一班級即可使用同一個班級名稱。</div>
+<div class="row">
+<select id="ttClassSelect" onchange="drawTimetable()"></select>
+<input id="ttClassInput" placeholder="新增班級，例如：六年一班">
+<button onclick="addTimetableClass()">➕ 新增班級</button>
+<input id="ttLesson" placeholder="節次，例如：第一節">
+<input id="ttStart" placeholder="08:40" style="width:85px"><span>~</span><input id="ttEnd" placeholder="09:20" style="width:85px">
+<button class="success" onclick="addTimetableRow()">➕ 新增這節課</button>
+</div>
+<table><thead><tr><th>節次名稱</th><th>上課時間</th><th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th><th>管理</th></tr></thead><tbody id="ttBody"></tbody></table>
+<div class="row" style="margin-top:15px"><button onclick="exportTimetable()">📤 匯出課表</button><label style="background:#8338ec;color:#fff;padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer">📥 匯入課表<input type="file" hidden accept=".csv" onchange="importTimetable(event)"></label><button class="danger" onclick="clearCurrentTimetable()">🗑️ 清空目前班級課表</button></div>
+</div>
+</section>
+
+<section id="exam" class="page">
+<div class="card">
+<h2>🔔 考場專用倒數系統</h2>
+<div class="row">
+<input id="examPeriod" placeholder="課堂名稱，如：第一節"><input id="examSubject" placeholder="科目，如：數學">
+<input id="examStart" placeholder="08:40" style="width:80px"><span>~</span><input id="examEnd" placeholder="09:20" style="width:80px">
+<input id="examMins" type="number" value="40" style="width:70px"><span>分鐘</span>
+<button class="success" onclick="addExam()">➕ 新增</button><select id="examSelect" onchange="changeExam()"></select>
+</div>
+<div class="exam-layout">
+<div class="card" style="background:#162447;color:#fff">
+<div id="examInfo" style="font-size:24px;text-align:center;font-weight:900;padding:10px;background:#1f4068;border-radius:8px">準備考試中</div>
+<div style="text-align:center;margin-top:15px">現在時間</div><div id="clock" class="big-count" style="color:#00f5d4">00:00:00</div>
+<div style="text-align:center;color:#ffbd59;font-weight:900">⏳ 剩餘時間</div><div id="examCountdown" class="big-count" style="color:#ff4757">00:00</div>
+<div id="examTip" style="text-align:center;color:#ffbd59">💡 到達設定時間後會自動開始</div>
+<button style="width:100%;margin-top:10px" onclick="startExamTimer()">▶️ 手動開始</button>
+<button class="gray" style="width:100%;margin-top:6px" onclick="stopExamTimer()">⏸️ 暫停</button>
+<button class="warn" style="width:100%;margin-top:6px" onclick="resetExamTimer()">🔄 重設</button>
+<div class="row" style="margin-top:8px"><button class="gray" onclick="adjustExam(1)">➕ 1 分鐘</button><button class="gray" onclick="adjustExam(-1)">➖ 1 分鐘</button></div>
+<button class="danger" style="width:100%" onclick="deleteExam()">🗑️ 刪除這節課</button>
+</div>
+<div class="blackboard"><h3>📌 🪵 考場規則與公告 🪵</h3><div id="examBoardTime" style="text-align:center;border-bottom:2px dashed #ffeb3b;padding-bottom:10px">課堂時間：未設定</div><textarea id="examRules" placeholder="老師可以在這裡輸入考試規則..." oninput="saveExamRules()"></textarea></div>
+</div>
+</div>
+</section>
+
+<section id="assignment" class="page">
+<div class="card">
+<h2>📚 課堂作業收交清點</h2>
+<div class="row"><input id="assignmentClass" placeholder="班級"><input id="assignmentName" placeholder="作業名稱"><button onclick="addAssignment()">➕ 新增作業</button><select id="assignmentSelect" onchange="changeAssignment()"></select></div>
+<div class="assignment-layout">
+<div class="card">
+<div id="assignmentInfo" style="font-size:22px;font-weight:900;text-align:center;padding:10px;background:#1f4068;color:#fff;border-radius:8px">請先新增或選擇作業</div>
+<div class="row" style="margin-top:10px"><input id="assignmentStudent" placeholder="同學姓名" style="flex:1"><button onclick="addAssignmentStudent()">👤 新增同學</button></div>
+<table><thead><tr><th>座號</th><th>姓名</th><th>繳交狀態</th><th>管理</th></tr></thead><tbody id="assignmentTable"></tbody></table>
+<button class="danger" style="width:100%;margin-top:12px" onclick="clearAssignments()">🗑️ 清空作業資料</button>
+</div>
+<div class="blackboard"><h3>📌 🪵 未交作業催繳公告 🪵</h3><div id="assignmentStatus" style="text-align:center;border-bottom:2px dashed #ffeb3b;padding-bottom:10px">進度：已收 0 人 / 總共 0 人</div><textarea id="assignmentNotice" readonly></textarea></div>
+</div>
+</div>
+</section>
+
+<section id="links" class="page">
+<div class="card"><h2>🔗 快速連結</h2>
+<div class="grid">
+<a class="card tool-card" href="https://www.canva.com/zh_tw/" target="_blank" rel="noopener">🎨 <b>Canva</b><div class="muted">開啟 Canva</div></a>
+<a class="card tool-card" href="https://www.youtube.com/" target="_blank" rel="noopener">▶️ <b>YouTube</b><div class="muted">開啟 YouTube</div></a>
+<a class="card tool-card" href="https://dict.concised.moe.edu.tw/index.jsp" target="_blank" rel="noopener">📖 <b>教育部辭典簡編本</b><div class="muted">開啟辭典</div></a>
+</div></div>
+</section>
+</main>
+</div>
+
+<script>
+const KEY={
+  school:"teachingTools_schoolData_v2", timetable:"teachingTools_timetable_v2",
+  exam:"teachingTools_exam_v2", assignment:"teachingTools_assignment_v2", page:"teachingTools_lastPage"
+};
+function load(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}}
+let schoolData=load(KEY.school,{});
+let timetables=load(KEY.timetable,{});
+let examData=load(KEY.exam,{list:[],rules:{}});
+let assignmentData=load(KEY.assignment,{list:[],notes:{}});
+let timerSeconds=0,timerInterval=null,alarmInterval=null,timerRunning=false;
+let currentExamId="",examSeconds=0,examInterval=null,examRunning=false;
+let currentAssignmentId="";
+
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function syncClasses(){
+  const names=new Set([...Object.keys(schoolData),...Object.keys(timetables)]);
+  names.forEach(n=>{if(!schoolData[n])schoolData[n]=[];if(!timetables[n])timetables[n]={rows:[],cells:{}}});
+  save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();
+}
+function refreshClassSelects(){
+  const ids=["studentClassSelect","ttClassSelect"];
+  ids.forEach(id=>{
+    const s=document.getElementById(id),cur=s.value;
+    s.innerHTML='<option value="">-- 請選擇班級 --</option>';
+    Object.keys(schoolData).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;s.appendChild(o)});
+    if(schoolData[cur])s.value=cur;
+  });
+}
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-"+id).classList.add("active");
+  const titles={home:"🏠 教學工具整合版",timer:"⏱️ 計時器",students:"🎒 學生管理及抽籤",timetable:"📅 課表",exam:"🔔 考試",assignment:"📚 作業",links:"🔗 快速連結"};
+  document.getElementById("pageTitle").textContent=titles[id];localStorage.setItem(KEY.page,id);
+}
+function addClass(){
+  const n=document.getElementById("classInput").value.trim();if(!n)return;
+  if(!schoolData[n])schoolData[n]=[];
+  if(!timetables[n])timetables[n]={rows:[],cells:{}};
+  save(KEY.school,schoolData);save(KEY.timetable,timetables);
+  document.getElementById("classInput").value="";refreshClassSelects();
+  document.getElementById("studentClassSelect").value=n;document.getElementById("ttClassSelect").value=n;
+  renderStudents();drawTimetable();
+}
+function addStudent(){
+  const c=document.getElementById("studentClassSelect").value,n=document.getElementById("studentInput").value.trim();
+  if(!c||!n)return;schoolData[c].push({name:n,score:0});save(KEY.school,schoolData);
+  document.getElementById("studentInput").value="";renderStudents();
+}
+function renderStudents(){
+  const c=document.getElementById("studentClassSelect").value,t=document.getElementById("studentTable");t.innerHTML="";
+  if(!c||!schoolData[c])return;
+  schoolData[c].forEach((s,i)=>{
+    const tr=document.createElement("tr");tr.innerHTML=`<td>${esc(c)}</td><td>${esc(s.name)}</td><td><b>${s.score}</b> 分</td><td>
+    <button class="success" onclick="changeScore(${i},1)">👍 +1</button>
+    <button class="danger" onclick="changeScore(${i},-1)">👎 -1</button>
+    <button class="gray" onclick="deleteStudent(${i})">❌</button></td>`;t.appendChild(tr)
+  });
+}
+function changeScore(i,p){const c=document.getElementById("studentClassSelect").value;if(!c)return;schoolData[c][i].score+=p;save(KEY.school,schoolData);renderStudents()}
+function deleteStudent(i){const c=document.getElementById("studentClassSelect").value;if(!c)return;schoolData[c].splice(i,1);save(KEY.school,schoolData);renderStudents()}
+function startLottery(){
+  const c=document.getElementById("studentClassSelect").value,arr=schoolData[c]||[];if(!arr.length)return;
+  const out=document.getElementById("luckyName"),btn=event?.target;let n=0;
+  if(btn)btn.disabled=true;const x=setInterval(()=>{out.textContent="✨ "+arr[Math.floor(Math.random()*arr.length)].name+" ✨";if(++n>15){clearInterval(x);if(btn)btn.disabled=false;out.textContent="🎉 【 "+arr[Math.floor(Math.random()*arr.length)].name+" 】 🎉"}},60)
+}
+function exportStudents(){
+ let csv="\uFEFF班級名稱,學生姓名,得分加總\n";Object.entries(schoolData).forEach(([c,a])=>a.forEach(s=>csv+=`${csvCell(c)},${csvCell(s.name)},${s.score}\n`));download(csv,"班級學生加扣分紀錄表.csv")
+}
+function importStudents(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^\uFEFF/,"").split(/\r?\n/);schoolData={};
+ lines.slice(1).forEach(line=>{if(!line.trim())return;const x=parseCSVLine(line);if(x.length>=3){const c=x[0].trim(),n=x[1].trim(),s=parseInt(x[2])||0;(schoolData[c]??=[]).push({name:n,score:s})}});
+ syncClasses();refreshClassSelects();const first=Object.keys(schoolData)[0];if(first){document.getElementById("studentClassSelect").value=first;document.getElementById("ttClassSelect").value=first;renderStudents();drawTimetable()}e.target.value=""};r.readAsText(f,"UTF-8")
+}
+function clearStudents(){if(!confirm("確定清空所有班級與學生資料？"))return;schoolData={};timetables={};save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();document.getElementById("studentTable").innerHTML=""}
+
+function addTimetableClass(){
+  const input=document.getElementById("ttClassInput");
+  const n=input.value.trim();
+  if(!n){alert("請輸入班級名稱");return}
+  if(schoolData[n]){
+    alert("這個班級已經存在");
+    input.focus();
+    return;
+  }
+  schoolData[n]=[];
+  if(!timetables[n])timetables[n]={rows:[],cells:{}};
+  save(KEY.school,schoolData);
+  save(KEY.timetable,timetables);
+  syncClasses();
+  refreshClassSelects();
+  document.getElementById("studentClassSelect").value=n;
+  document.getElementById("ttClassSelect").value=n;
+  input.value="";
+  renderStudents();
+  drawTimetable();
+}
+
+function addTimetableRow(){
+ const c=document.getElementById("ttClassSelect").value;if(!c){alert("請先選擇班級");return}
+ const name=document.getElementById("ttLesson").value.trim(),st=document.getElementById("ttStart").value.trim(),en=document.getElementById("ttEnd").value.trim();if(!name)return;
+ const id="row_"+Date.now();timetables[c].rows.push({id,name,time:(st||en)?`${st} ~ ${en}`:"-"});save(KEY.timetable,timetables);
+ ["ttLesson","ttStart","ttEnd"].forEach(x=>document.getElementById(x).value="");drawTimetable()
+}
+function drawTimetable(){
+ const c=document.getElementById("ttClassSelect").value,t=document.getElementById("ttBody");t.innerHTML="";if(!c||!timetables[c])return;
+ const d=timetables[c];if(!d.rows.length){t.innerHTML='<tr><td colspan="8" class="muted">目前沒有課堂</td></tr>';return}
+ d.rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${esc(r.name)}</b></td><td>${esc(r.time)}</td>`;
+ for(let j=1;j<=5;j++){const id=r.id+"_"+j;tr.innerHTML+=`<td><input value="${escAttr(d.cells[id]||"")}" oninput="saveCell('${id}',this.value)" style="width:100%;text-align:center"></td>`}
+ tr.innerHTML+=`<td><button class="danger" onclick="deleteRow('${r.id}')">❌</button></td>`;t.appendChild(tr)})
+}
+function saveCell(id,v){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c].cells[id]=v;save(KEY.timetable,timetables)}
+function deleteRow(id){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c].rows=timetables[c].rows.filter(r=>r.id!==id);for(let j=1;j<=5;j++)delete timetables[c].cells[id+"_"+j];save(KEY.timetable,timetables);drawTimetable()}
+function clearCurrentTimetable(){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c]={rows:[],cells:{}};save(KEY.timetable,timetables);drawTimetable()}
+function exportTimetable(){
+ const c=document.getElementById("ttClassSelect").value;if(!c)return;const d=timetables[c];let csv="\uFEFF班級名稱,節次名稱,上課時間,週一,週二,週三,週四,週五\n";
+ d.rows.forEach(r=>{let line=[c,r.name,r.time];for(let j=1;j<=5;j++)line.push(d.cells[r.id+"_"+j]||"");csv+=line.map(csvCell).join(",")+"\n"});download(csv,c+"_課表備份.csv")
+}
+function importTimetable(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^\uFEFF/,"").split(/\r?\n/);let first="";
+ lines.slice(1).forEach((line,i)=>{if(!line.trim())return;const x=parseCSVLine(line);if(x.length<8)return;const c=x[0].trim(),name=x[1].trim(),time=x[2].trim();if(!c)return;if(!schoolData[c])schoolData[c]=[];if(!timetables[c])timetables[c]={rows:[],cells:{}};if(!first)first=c;let row=timetables[c].rows.find(z=>z.name===name&&z.time===time);if(!row){row={id:"row_"+Date.now()+"_"+i,name,time};timetables[c].rows.push(row)}for(let j=1;j<=5;j++)if(x[j+2])timetables[c].cells[row.id+"_"+j]=x[j+2].trim()});
+ save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();if(first){document.getElementById("ttClassSelect").value=first;document.getElementById("studentClassSelect").value=first}drawTimetable();renderStudents();e.target.value=""};r.readAsText(f,"UTF-8")
+}
+
+function setQuickTime(m){pauseTimer();stopAlarm();timerSeconds=m*60;updateTimerView()}
+function setCustomTime(){pauseTimer();stopAlarm();timerSeconds=(+document.getElementById("th").value||0)*3600+(+document.getElementById("tm").value||0)*60+(+document.getElementById("ts").value||0);updateTimerView()}
+function toggleTimer(){timerRunning?pauseTimer():startTimer()}
+function startTimer(){if(timerSeconds<=0){alert("請先設定時間！");return}stopAlarm();timerRunning=true;document.getElementById("timerStart").textContent="暫停";timerInterval=setInterval(()=>{if(timerSeconds<=0){pauseTimer();document.getElementById("timerDisplay").textContent="時間到！";startAlarm();alert("時間到囉！點擊確定後，按「重設」即可停止聲音。")}else{timerSeconds--;updateTimerView()}},1000)}
+function pauseTimer(){timerRunning=false;clearInterval(timerInterval);document.getElementById("timerStart").textContent="開始"}
+function resetTimer(){pauseTimer();stopAlarm();timerSeconds=0;["th","tm","ts"].forEach(x=>document.getElementById(x).value=0);updateTimerView()}
+function updateTimerView(){const h=Math.floor(timerSeconds/3600),m=Math.floor(timerSeconds%3600/60),s=timerSeconds%60;document.getElementById("timerDisplay").textContent=[h,m,s].map(x=>String(x).padStart(2,"0")).join(":")}
+function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.35;o.start();g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.2);o.stop(c.currentTime+.2)}catch(e){}}
+function startAlarm(){beep();setTimeout(beep,250);alarmInterval=setInterval(()=>{beep();setTimeout(beep,250)},1200)}
+function stopAlarm(){if(alarmInterval){clearInterval(alarmInterval);alarmInterval=null}}
+
+function addExam(){
+ const p=document.getElementById("examPeriod").value.trim(),s=document.getElementById("examSubject").value.trim(),st=document.getElementById("examStart").value.trim(),en=document.getElementById("examEnd").value.trim(),mins=parseInt(document.getElementById("examMins").value)||40;if(!p||!s)return;
+ const id="exam_"+Date.now();examData.list.push({id,period:p,subject:s,time:(st||en)?`${st} ~ ${en}`:"",mins});examData.rules[id]="1. 桌面清空，只留文具。\n2. 考試期間請保持安靜。\n3. 考試時間到才能交卷。";save(KEY.exam,examData);
+ ["examPeriod","examSubject","examStart","examEnd"].forEach(x=>document.getElementById(x).value="");document.getElementById("examMins").value=40;refreshExamSelect();document.getElementById("examSelect").value=id;changeExam()
+}
+function refreshExamSelect(){const s=document.getElementById("examSelect"),cur=s.value;s.innerHTML='<option value="">-- 請選擇當天課堂 --</option>';examData.list.forEach(e=>{const o=document.createElement("option");o.value=e.id;o.textContent=e.period+"："+e.subject;s.appendChild(o)});if(examData.list.some(e=>e.id===cur))s.value=cur}
+function changeExam(){stopExamTimer();currentExamId=document.getElementById("examSelect").value;const e=examData.list.find(x=>x.id===currentExamId);if(!e){document.getElementById("examInfo").textContent="準備考試中";document.getElementById("examCountdown").textContent="00:00";document.getElementById("examBoardTime").textContent="課堂時間：未設定";document.getElementById("examRules").value="";examSeconds=0;return}document.getElementById("examInfo").textContent=e.period+"："+e.subject;document.getElementById("examBoardTime").textContent="🕒 課堂時間："+(e.time||"未設定時間");document.getElementById("examRules").value=examData.rules[e.id]||"";examSeconds=e.mins*60;updateExamView()}
+function startExamTimer(){if(examRunning||examSeconds<=0)return;examRunning=true;examInterval=setInterval(()=>{examSeconds--;updateExamView();if(examSeconds<=0){stopExamTimer();document.getElementById("examCountdown").textContent="時間到！";alert("🔔 考試時間到！請同學立即停筆。")}},1000)}
+function stopExamTimer(){clearInterval(examInterval);examRunning=false}
+function resetExamTimer(){stopExamTimer();const e=examData.list.find(x=>x.id===currentExamId);if(e){examSeconds=e.mins*60;updateExamView()}}
+function adjustExam(n){examSeconds=Math.max(0,examSeconds+n*60);updateExamView()}
+function updateExamView(){const m=Math.floor(examSeconds/60),s=examSeconds%60;document.getElementById("examCountdown").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
+function saveExamRules(){if(!currentExamId)return;examData.rules[currentExamId]=document.getElementById("examRules").value;save(KEY.exam,examData)}
+function deleteExam(){if(!currentExamId)return;examData.list=examData.list.filter(e=>e.id!==currentExamId);delete examData.rules[currentExamId];save(KEY.exam,examData);currentExamId="";refreshExamSelect();changeExam()}
+
+function examClock(){
+ const d=new Date();document.getElementById("clock").textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(x=>String(x).padStart(2,"0")).join(":");
+ if(!examRunning){const hm=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");const e=examData.list.find(x=>x.time&&x.time.startsWith(hm)&&d.getSeconds()===0);if(e){document.getElementById("examSelect").value=e.id;changeExam();startExamTimer();document.getElementById("examTip").textContent="🚀 時間已到！系統已自動開始倒數！"}}
+}
+
+function addAssignment(){
+ const c=document.getElementById("assignmentClass").value.trim(),n=document.getElementById("assignmentName").value.trim();if(!c||!n){alert("請輸入班級與作業名稱");return}
+ const id="as_"+Date.now();assignmentData.list.push({id,class:c,name:n,students:[]});assignmentData.notes[id]="";save(KEY.assignment,assignmentData);document.getElementById("assignmentClass").value="";document.getElementById("assignmentName").value="";refreshAssignments();document.getElementById("assignmentSelect").value=id;changeAssignment()
+}
+function refreshAssignments(){const s=document.getElementById("assignmentSelect"),cur=s.value;s.innerHTML='<option value="">-- 請選擇作業項目 --</option>';assignmentData.list.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent="【"+a.class+"】"+a.name;s.appendChild(o)});if(assignmentData.list.some(a=>a.id===cur))s.value=cur}
+function changeAssignment(){currentAssignmentId=document.getElementById("assignmentSelect").value;const a=assignmentData.list.find(x=>x.id===currentAssignmentId);if(!a){document.getElementById("assignmentInfo").textContent="請先新增或選擇作業";document.getElementById("assignmentTable").innerHTML="";document.getElementById("assignmentStatus").textContent="進度：已收 0 人 / 總共 0 人";document.getElementById("assignmentNotice").value="";return}document.getElementById("assignmentInfo").textContent="📋 "+a.class+" － "+a.name;drawAssignment()}
+function addAssignmentStudent(){if(!currentAssignmentId){alert("請先選擇作業項目");return}const n=document.getElementById("assignmentStudent").value.trim();if(!n)return;assignmentData.list.find(x=>x.id===currentAssignmentId).students.push({name:n,status:"未交"});document.getElementById("assignmentStudent").value="";save(KEY.assignment,assignmentData);drawAssignment()}
+function drawAssignment(){const a=assignmentData.list.find(x=>x.id===currentAssignmentId),t=document.getElementById("assignmentTable");t.innerHTML="";if(!a)return;let got=0,un=[];a.students.forEach((s,i)=>{if(s.status==="已交")got++;else un.push((i+1)+"號 "+s.name);const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${esc(s.name)}</td><td><span class="badge ${s.status==="已交"?"yes":"no"}" onclick="toggleAssignment(${i})">${s.status}</span></td><td><button class="danger" onclick="deleteAssignmentStudent(${i})">❌</button></td>`;t.appendChild(tr)});document.getElementById("assignmentStatus").textContent=`進度：已收 ${got} 人 / 總共 ${a.students.length} 人`;document.getElementById("assignmentNotice").value="🚨【未交名單公告】🚨\n"+(un.length?`以下 ${un.length} 位同學尚未繳交：\n📌 ${un.join("、 ")}`:"🎉 全班皆已繳交完畢！")}
+function toggleAssignment(i){const a=assignmentData.list.find(x=>x.id===currentAssignmentId);a.students[i].status=a.students[i].status==="已交"?"未交":"已交";save(KEY.assignment,assignmentData);drawAssignment()}
+function deleteAssignmentStudent(i){const a=assignmentData.list.find(x=>x.id===currentAssignmentId);a.students.splice(i,1);save(KEY.assignment,assignmentData);drawAssignment()}
+function clearAssignments(){if(!confirm("確定清空所有作業資料？"))return;assignmentData={list:[],notes:{}};save(KEY.assignment,assignmentData);refreshAssignments();changeAssignment()}
+
+function csvCell(v){return `"${String(v??"").replace(/"/g,'""')}"`}
+function parseCSVLine(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===","&&!q){out.push(cur);cur=""}else cur+=ch}out.push(cur);return out}
+function download(text,name){const b=new Blob([text],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function escAttr(s){return esc(s)}
+
+window.addEventListener("storage",()=>{schoolData=load(KEY.school,{});timetables=load(KEY.timetable,{});syncClasses();renderStudents();drawTimetable()});
+setInterval(examClock,1000);
+
+syncClasses();refreshExamSelect();refreshAssignments();updateTimerView();examClock();
+const last=localStorage.getItem(KEY.page)||"home";showPage(document.getElementById(last)?last:"home");
+if(Object.keys(schoolData).length){const first=Object.keys(schoolData)[0];document.getElementById("studentClassSelect").value=first;document.getElementById("ttClassSelect").value=first;renderStudents();drawTimetable()}
+</script>
+</body>
 </html>
