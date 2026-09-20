@@ -68,7 +68,7 @@ th{background:#eff6ff}
 
 <main class="main">
 <div class="topbar">
-  <h1 id="pageTitle">🏠 教學工具</h1>
+  <h1 >🏠 教學工具 </h1>
   <div class="muted">💾 資料會自動儲存在本機瀏覽器</div>
 </div>
 
@@ -322,7 +322,7 @@ function importTimetable(e){
 function setQuickTime(m){pauseTimer();stopAlarm();timerSeconds=m*60;updateTimerView()}
 function setCustomTime(){pauseTimer();stopAlarm();timerSeconds=(+document.getElementById("th").value||0)*3600+(+document.getElementById("tm").value||0)*60+(+document.getElementById("ts").value||0);updateTimerView()}
 function toggleTimer(){timerRunning?pauseTimer():startTimer()}
-function startTimer(){if(timerSeconds<=0){alert("請先設定時間！");return}stopAlarm();timerRunning=true;document.getElementById("timerStart").textContent="暫停";timerInterval=setInterval(()=>{if(timerSeconds<=0){pauseTimer();document.getElementById("timerDisplay").textContent="時間到！";startAlarm();alert("時間到囉！點擊確定後，按「重設」即可停止聲音。")}else{timerSeconds--;updateTimerView()}},1000)}
+function startTimer(){if(timerSeconds<=0){alert("請先設定時間！");return}stopAlarm();timerRunning=true;document.getElementById("timerStart").textContent="暫停";timerInterval=setInterval(()=>{if(timerSeconds<=0){pauseTimer();document.getElementById("timerDisplay").textContent="時間到！";startAlarm();}else{timerSeconds--;updateTimerView()}},1000)}
 function pauseTimer(){timerRunning=false;clearInterval(timerInterval);document.getElementById("timerStart").textContent="開始"}
 function resetTimer(){pauseTimer();stopAlarm();timerSeconds=0;["th","tm","ts"].forEach(x=>document.getElementById(x).value=0);updateTimerView()}
 function updateTimerView(){const h=Math.floor(timerSeconds/3600),m=Math.floor(timerSeconds%3600/60),s=timerSeconds%60;document.getElementById("timerDisplay").textContent=[h,m,s].map(x=>String(x).padStart(2,"0")).join(":")}
