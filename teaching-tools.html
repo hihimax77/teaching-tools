@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教學工具</title>
+<link rel="icon" type="image/x-icon" href="C:\Users\sandy\Downloads\icon_result.ico">
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--text:#1f2937;--muted:#64748b;--primary:#3a86ff;
+  --primary2:#2563eb;--danger:#e63946;--success:#16a34a;--warning:#f59e0b;
+  --border:#dbe3ee;--shadow:0 8px 25px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{border:0;border-radius:9px;padding:9px 13px;background:var(--primary);color:#fff;font-weight:700;cursor:pointer}
+button:hover{background:var(--primary2)}
+button.danger{background:var(--danger)} button.success{background:var(--success)}
+button.warn{background:var(--warning)} button.gray{background:#64748b}
+input,select,textarea{border:1px solid var(--border);border-radius:8px;padding:9px;background:#fff;color:var(--text)}
+textarea{resize:vertical}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#172554;color:#fff;padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{font-size:22px;font-weight:900;margin-bottom:18px}
+.nav button{display:block;width:100%;text-align:left;margin:6px 0;background:transparent}
+.nav button:hover,.nav button.active{background:#2563eb}
+.main{flex:1;padding:24px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}
+h1{margin:0;font-size:28px} h2{margin-top:0}
+.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.tool-card{cursor:pointer;transition:.15s}.tool-card:hover{transform:translateY(-2px)}
+.tool-icon{font-size:35px}.tool-title{font-size:19px;font-weight:800;margin:8px 0}.muted{color:var(--muted)}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.row>*{max-width:100%}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{border:1px solid var(--border);padding:9px;text-align:center}
+th{background:#eff6ff}
+.timer-display{font:800 68px monospace;text-align:center;padding:20px;background:#eef2f7;border-radius:12px;margin:15px 0}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.exam-layout,.assignment-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+.blackboard{background:#0f3425;color:#fff;border:5px solid #5c3d2e;border-radius:12px;padding:20px;min-height:400px}
+.blackboard h3{text-align:center;color:#ffeb3b}.blackboard textarea{width:100%;height:320px;background:transparent;border:0;color:#fff;font-size:18px}
+.big-count{font:800 70px monospace;text-align:center;color:#00f5d4}
+.badge{display:inline-block;padding:5px 10px;border-radius:99px;color:#fff;font-weight:800;cursor:pointer}
+.yes{background:#16a34a}.no{background:#e63946}
+.status{padding:10px;border-radius:9px;background:#eff6ff;margin:10px 0}
+@media(max-width:800px){.sidebar{width:190px}.exam-layout,.assignment-layout{grid-template-columns:1fr}.timer-display{font-size:48px}}
+@media(max-width:600px){.app{display:block}.sidebar{position:static;width:100%;height:auto}.nav{display:grid;grid-template-columns:1fr 1fr}.main{padding:12px}}
+/* 可收合的側邊欄 */
+.sidebar{transition:width .2s ease,padding .2s ease}
+.logo{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo-btn{width:40px;height:40px;padding:0;flex:none;font-size:22px;line-height:1;background:transparent;border-radius:10px;display:inline-flex;align-items:center;justify-content:center}
+.logo-btn:hover{background:rgba(255,255,255,.18)}
+.logo-btn .ic-bars{display:none;font-size:24px}
+.logo-btn:hover .ic-grad{display:none}
+.logo-btn:hover .ic-bars{display:inline}
+.nav button{white-space:nowrap;overflow:hidden}
+.app.collapsed .sidebar{width:68px;padding:18px 10px}
+.app.collapsed .logo{justify-content:center}
+.app.collapsed .logo-text,.app.collapsed .nav .lb{display:none}
+.app.collapsed .nav button{text-align:center;padding:9px 0;font-size:20px}
+@media(max-width:600px){.app.collapsed .sidebar{width:100%}.app.collapsed .nav{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><button class="logo-btn" id="sbToggle" onclick="toggleSidebar()" title="收合／展開側邊欄" aria-label="收合或展開側邊欄"><span class="ic-grad">🎓</span><span class="ic-bars">☰</span></button><span class="logo-text">教學工具</span></div>
+  <div class="nav">
+    <button onclick="showPage('home')" id="nav-home" title="首頁"><span class="ic">🏠</span><span class="lb"> 首頁</span></button>
+    <button onclick="showPage('timer')" id="nav-timer" title="計時器"><span class="ic">⏱️</span><span class="lb"> 計時器</span></button>
+    <button onclick="showPage('students')" id="nav-students" title="學生管理及抽籤"><span class="ic">🎒</span><span class="lb"> 學生管理及抽籤</span></button>
+    <button onclick="showPage('timetable')" id="nav-timetable" title="課表"><span class="ic">📅</span><span class="lb"> 課表</span></button>
+    <button onclick="showPage('exam')" id="nav-exam" title="考試"><span class="ic">🔔</span><span class="lb"> 考試</span></button>
+    <button onclick="showPage('assignment')" id="nav-assignment" title="作業"><span class="ic">📚</span><span class="lb"> 作業</span></button>
+    <button onclick="showPage('group')" id="nav-group" title="分組工具"><span class="ic">👥</span><span class="lb"> 分組工具</span></button>
+    <button onclick="showPage('links')" id="nav-links" title="快速連結"><span class="ic">🔗</span><span class="lb"> 快速連結</span></button>
+  </div>
+</aside>
+
+<main class="main">
+<div class="topbar">
+  <h1 >🏠 教學工具 </h1>
+  <div class="muted">💾 資料會自動儲存在本機瀏覽器</div>
+</div>
+
+<section id="home" class="page">
+  <div class="card">
+    <h2>教學工具總覽</h2>
+    <p class="muted">單一 HTML 整合版。學生管理與課表共用同一份「班級資料」，新增班級後兩邊會同步。</p>
+  </div>
+  <div class="grid">
+    <div class="card tool-card" onclick="showPage('timer')"><div class="tool-icon">⏱️</div><div class="tool-title">計時器</div><div class="muted">快捷時間、自訂時間、到時警報</div></div>
+    <div class="card tool-card" onclick="showPage('students')"><div class="tool-icon">🎒</div><div class="tool-title">學生管理及抽籤</div><div class="muted">班級、學生、加扣分、隨機抽籤</div></div>
+    <div class="card tool-card" onclick="showPage('timetable')"><div class="tool-icon">📅</div><div class="tool-title">課表</div><div class="muted">多班級、節次、週一至週五</div></div>
+    <div class="card tool-card" onclick="showPage('exam')"><div class="tool-icon">🔔</div><div class="tool-title">考試</div><div class="muted">多天考試、科目時間表、倒數能量條</div></div>
+    <div class="card tool-card" onclick="showPage('assignment')"><div class="tool-icon">📚</div><div class="tool-title">作業</div><div class="muted">繳交狀態與未交名單</div></div>
+    <div class="card tool-card" onclick="showPage('group')"><div class="tool-icon">👥</div><div class="tool-title">分組工具</div><div class="muted">隨機分組、男女平均、不同組限制、抽籤</div></div>
+    <div class="card tool-card" onclick="showPage('links')"><div class="tool-icon">🔗</div><div class="tool-title">快速連結</div><div class="muted">Canva、YouTube、教育部辭典</div></div>
+  </div>
+</section>
+
+<section id="timer" class="page">
+<div class="card">
+<h2>⏱️ 多功能計時器</h2>
+<div id="timerDisplay" class="timer-display">00:00:00</div>
+<div class="quick-grid">
+<button onclick="setQuickTime(1)">1 分鐘</button><button onclick="setQuickTime(3)">3 分鐘</button><button onclick="setQuickTime(5)">5 分鐘</button>
+<button onclick="setQuickTime(10)">10 分鐘</button><button onclick="setQuickTime(15)">15 分鐘</button><button onclick="setQuickTime(30)">30 分鐘</button>
+</div>
+<div class="row" style="margin-top:15px">
+<input type="number" id="th" min="0" value="0" placeholder="時">時
+<input type="number" id="tm" min="0" max="59" value="0" placeholder="分">分
+<input type="number" id="ts" min="0" max="59" value="0" placeholder="秒">秒
+<button class="success" onclick="setCustomTime()">設定</button>
+</div>
+<div class="row"><button id="timerStart" class="warn" onclick="toggleTimer()">開始</button><button class="gray" onclick="resetTimer()">重設</button></div>
+</div>
+</section>
+
+<section id="students" class="page">
+<div class="card">
+<h2>🎒 班級管理與加扣分系統</h2>
+<div class="status">🔄 <b>班級同步：</b>這裡建立/刪除的班級會同步到「課表」。課表也能使用這些班級。</div>
+<div class="row">
+<input id="classInput" placeholder="新班級，例如：五年二班"><button onclick="addClass()">➕ 新增班級</button>
+<select id="studentClassSelect" onchange="renderStudents()"></select>
+<input id="studentInput" placeholder="學生姓名"><button onclick="addStudent()">👤 新增學生</button>
+</div>
+<div class="card" style="background:#fff7e6;border:2px dashed #ff9f1c;text-align:center">
+<b>🎲 隨機抽籤</b><div id="luckyName" style="font-size:30px;font-weight:900;margin:10px;color:#d90429">準備抽籤...</div>
+<button class="warn" onclick="startLottery()">🎯 開始抽籤</button>
+</div>
+<table><thead><tr><th>班級</th><th>姓名</th><th>分數</th><th>操作</th></tr></thead><tbody id="studentTable"></tbody></table>
+<div class="row" style="margin-top:15px"><button onclick="exportStudents()">📤 匯出 CSV</button><label style="background:#8338ec;color:#fff;padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer">📥 匯入 CSV<input type="file" hidden accept=".csv" onchange="importStudents(event)"></label><button class="danger" onclick="clearStudents()">🗑️ 清空學生資料</button></div>
+</div>
+</section>
+
+<section id="timetable" class="page">
+<div class="card">
+<h2>📅 多班級自訂課表</h2>
+<div class="status">🔄 <b>班級同步：</b>班級清單與「學生管理」共用。選擇同一班級即可使用同一個班級名稱。</div>
+<div class="row">
+<select id="ttClassSelect" onchange="drawTimetable()"></select>
+<input id="ttClassInput" placeholder="新增班級，例如：六年一班">
+<button onclick="addTimetableClass()">➕ 新增班級</button>
+<input id="ttLesson" placeholder="節次，例如：第一節">
+<input id="ttStart" placeholder="08:40" style="width:85px"><span>~</span><input id="ttEnd" placeholder="09:20" style="width:85px">
+<button class="success" onclick="addTimetableRow()">➕ 新增這節課</button>
+</div>
+<table><thead><tr><th>節次名稱</th><th>上課時間</th><th>週一</th><th>週二</th><th>週三</th><th>週四</th><th>週五</th><th>管理</th></tr></thead><tbody id="ttBody"></tbody></table>
+<div class="row" style="margin-top:15px"><button onclick="exportTimetable()">📤 匯出課表</button><label style="background:#8338ec;color:#fff;padding:9px 13px;border-radius:9px;font-weight:700;cursor:pointer">📥 匯入課表<input type="file" hidden accept=".csv" onchange="importTimetable(event)"></label><button class="danger" onclick="clearCurrentTimetable()">🗑️ 清空目前班級課表</button></div>
+</div>
+</section>
+
+<section id="exam" class="page">
+<iframe id="examFrame" title="考試工具" style="width:100%;height:calc(100vh - 215px);min-height:640px;border:0;border-radius:18px;box-shadow:var(--shadow);background:#FFFDD0" allow="autoplay" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-Hant&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;title&gt;考試工具&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Orbitron:wght@900&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--bg:#FFFDD0;--ink:#3f5468;--mut:#6f8aa0;
+--blue:#d9eefb;--blue-d:#a9d6ef;--blue-t:#2f7ea5;
+--green:#ddf5e7;--green-d:#a6e0c2;--green-t:#2f8a62;
+--pink:#ffe3ec;--pink-d:#ffb8cc;--pink-t:#d6405f;--tn:1;--tc:1}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;height:100vh;min-height:560px;display:flex;flex-direction:column;background:var(--bg) var(--bgimg,none) center/cover no-repeat fixed;color:var(--ink);font-family:&quot;Noto Sans TC&quot;,&quot;PingFang TC&quot;,&quot;Microsoft JhengHei&quot;,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:1;height:1.8em;cursor:pointer}
+input[type=number]{-moz-appearance:number-input}
+
+/* 上方列 */
+header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 18px;background:var(--blue);border-bottom:4px dashed var(--pink-d)}
+.logo{font-size:1.5rem;font-weight:900;display:flex;align-items:center;gap:8px}.logo svg{display:block}
+.logo span{display:inline-block;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px) rotate(8deg)}}
+.btn{border:0;border-radius:999px;padding:.4em 1em;background:var(--blue-d);font-weight:700;cursor:pointer;box-shadow:0 3px 0 #86bddb;transition:.1s;color:var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.pink{background:var(--pink-d);box-shadow:0 3px 0 #f090ab}
+.btn.mint{background:var(--green-d);box-shadow:0 3px 0 #7fc6a2}
+.sp{flex:1}
+#title{font-size:1.2rem;font-weight:900;border:2px dashed transparent;border-radius:12px;padding:.2em .6em;background:transparent;text-align:right;width:min(16em,100%)}
+#title:hover,#title:focus{border-color:var(--pink-d);outline:0;background:var(--pink);color:#3f5468}
+
+/* 主版面 */
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.16fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:4.5vh 2.6vw;padding:4vh 4vw 2vh}
+.col{display:flex;flex-direction:column;gap:1.5vh;min-width:0;min-height:0}
+.card{border:3px solid;border-radius:24px;padding:14px}
+
+.zb{position:absolute;top:10px;right:14px;display:flex;gap:6px;z-index:2}
+.zb .btn{padding:.15em .75em;font-size:.85rem}
+#nowCard,#noticeCard{position:relative}
+/* 現在考試（[1]）：外框固定，字隨 A+/A- 放大縮小 */
+#nowCard{flex:3.6 1 0;min-height:0;display:flex;flex-direction:column;padding:2vh 4%;background:var(--pink);border-color:var(--pink-d);box-shadow:0 6px 0 var(--pink-d)}
+#now{flex:1;min-height:90px;padding-top:2.2rem;container-type:size;overflow:hidden;display:flex;text-align:left;font-weight:700;--fit:1}
+#now .ni{margin-top:auto;max-width:100%;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .6em}
+#now .nm{font-size:calc(max(30px,min(6vw,9.8vh))*var(--tn)*var(--fit));line-height:1.1;word-break:break-all}
+#now small{display:block;font-size:calc(max(14px,min(2.7vw,4.3vh))*var(--tn)*var(--fit));color:var(--mut);font-weight:700}
+#bar-label{display:none}
+#barBox{margin-top:1.2vh}
+.bar-wrap{position:relative;height:clamp(2.2rem,8vh,3.6rem);background:var(--green);border-radius:999px;border:3px solid var(--green-d);overflow:hidden}
+#bar{height:100%;width:0;background:linear-gradient(90deg,#b5ecd0,#8fdcb7);border-radius:999px;transition:width .6s,background .6s}
+#bar.low{background:linear-gradient(90deg,#ffd0dd,#ffa3bc)}
+#barTxt{color:#3f5468;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:clamp(.95rem,2.2vh,1.4rem)}
+
+/* 時鐘 */
+#clockCard{position:relative;flex:.7 1 0;min-height:70px;container-type:size;display:flex;align-items:center;justify-content:center;background:var(--blue);border-color:var(--blue-d);box-shadow:0 6px 0 var(--blue-d)}
+#clock{font-family:&quot;Orbitron&quot;,&quot;Audiowide&quot;,Consolas,&quot;Courier New&quot;,monospace;text-align:center;line-height:1;font-size:min(15cqw,100cqh);font-weight:900;letter-spacing:.04em;white-space:nowrap;font-variant-numeric:tabular-nums}
+#clock i{font-style:normal;color:var(--pink-t);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+/* 應到 已到 未到 */
+#att{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5%;padding:0 4%}
+.abox{min-height:0;border:3px solid;border-radius:20px;padding:1vh 10px;display:flex;flex-direction:column;gap:.15em;background:var(--blue);border-color:var(--blue-d);box-shadow:0 5px 0 var(--blue-d)}
+.abox.a2{background:var(--green);border-color:var(--green-d);box-shadow:0 5px 0 var(--green-d)}
+.abox.a3{background:var(--pink);border-color:var(--pink-d);box-shadow:0 5px 0 var(--pink-d)}
+.abox label{font-size:clamp(1.5rem,4.6vh,2.5rem);line-height:1.1;font-weight:800;color:var(--mut)}
+.abox input{width:100%;min-width:0;border:2px solid transparent;border-radius:10px;background:transparent;text-align:center;font-size:clamp(1.6rem,5vh,2.6rem);font-weight:900;padding:.05em}
+.abox input:hover,.abox input:focus{border-color:var(--blue-d);background:rgba(255,255,255,.55);outline:0}
+
+/* 公告：字隨 A+/A- 放大縮小 */
+#noticeCard{flex:1 1 0;min-height:0;display:flex;flex-direction:column;background:var(--green);border-color:var(--green-d);box-shadow:0 6px 0 var(--green-d)}
+.ntitle{font-size:1rem;font-weight:900;margin-bottom:6px;text-align:center}
+#notice{flex:1;min-height:0;width:100%;border:0;resize:none;background:transparent;border-radius:16px;padding:8px 12px;font-size:calc(max(14px,min(2.8vh,1.6vw))*var(--tc));font-weight:700;line-height:1.5;outline:0;overflow:auto}
+
+/* 科目方塊（[2]）與 ＋（[3]） */
+#subRow{grid-column:1/-1;display:flex;gap:clamp(12px,2.6vw,40px);min-width:0;overflow-x:auto;overflow-y:hidden;padding:2px 2px 8px}
+.blk{position:relative;flex:1 1 0;min-width:6rem;container-type:inline-size;display:flex;flex-direction:column;gap:4px;text-align:left;overflow:hidden;border:3px solid;border-radius:22px;padding:10px 12px;cursor:pointer;transition:flex-grow .25s}
+.blk.c0{background:var(--blue);border-color:var(--blue-d);box-shadow:0 5px 0 var(--blue-d)}
+.blk.c1{background:var(--green);border-color:var(--green-d);box-shadow:0 5px 0 var(--green-d)}
+.blk.c2{background:var(--pink);border-color:var(--pink-d);box-shadow:0 5px 0 var(--pink-d)}
+.blk.cur{box-shadow:inset 0 0 0 4px #ff8fab,0 5px 0 var(--pink-d)}
+.blk:active{transform:translateY(3px)}
+.bn{padding-right:26px;font-size:clamp(.9rem,9cqw,1.4rem);font-weight:900;line-height:1.15;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all}
+.bm{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:4px}
+.bt{font-size:clamp(.65rem,6cqw,.9rem);font-weight:700;color:var(--mut);font-variant-numeric:tabular-nums}
+.bt span{white-space:nowrap}
+.badge{display:inline-block;padding:.15em .7em;border-radius:999px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.s-wait{background:#c3e4f7;color:var(--blue-t)}.s-on{background:var(--pink-d);color:#b52a49;animation:pulse 1.2s infinite}.s-end{background:var(--green-d);color:var(--green-t)}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.blk.plus{flex:none;min-width:0;width:7vw;min-width:56px;align-self:center;min-height:3.2rem;align-items:center;justify-content:center;font-size:2.6rem;font-weight:900;background:var(--green);border-color:var(--green-d);border-style:dashed;box-shadow:none;color:var(--green-t)}
+.empty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-weight:700;background:var(--blue);border-radius:22px;padding:10px}
+
+/* 下方列 */
+footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:10vh;padding:8px 4vw;background:var(--green);border-top:4px dashed var(--blue-d)}
+#footBtns{display:flex;gap:8px;justify-self:start}#footBtns .btn{font-size:.9rem}
+#tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;justify-content:center;grid-column:2}
+.tab{border:0;border-radius:18px 18px 4px 4px;padding:.4em 1.2em;background:var(--blue);font-weight:700;cursor:pointer;color:var(--ink)}
+.tab.on{background:var(--blue-d)}
+.tab .x{margin-left:6px;opacity:.7}
+
+/* 編輯科目小視窗 */
+#mdOverlay{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(140,185,215,.5);padding:16px}
+#mdOverlay[hidden]{display:none}
+#md{width:min(360px,100%);background:var(--blue);border:4px solid var(--blue-d);border-radius:26px;box-shadow:0 8px 0 var(--blue-d);padding:18px;display:flex;flex-direction:column;gap:12px;animation:tuPop .25s ease-out}
+.mdh{display:flex;align-items:center;justify-content:space-between;font-size:1.2rem;font-weight:900}
+.mdDel{border:0;background:var(--pink);border-radius:999px;padding:.25em .8em;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--pink-t)}
+.mf{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800}
+#mdName{width:11em;max-width:65%;border:2px solid var(--green-d);border-radius:12px;background:#f6fffa;padding:.35em .6em;outline:0}
+.tm{display:flex;align-items:center;gap:2px}
+.tm input{width:4.4em;border:2px solid var(--green-d);border-radius:12px;background:#f6fffa;padding:.35em .3em .35em .5em;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;outline:0}
+#mdName:focus,.tm input:focus{border-color:#ff8fab}
+.mdb{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.mdb .btn{padding:.45em 1.4em}
+
+/* 背景顏色下拉選單 */
+#bgWrap{position:relative}
+#bgMenu{--ink:#3f5468;--mut:#6f8aa0;color:#3f5468;max-height:calc(100vh - 80px);overflow:auto;position:absolute;top:calc(100% + 8px);left:0;z-index:60;min-width:240px;background:var(--blue);border:3px solid var(--blue-d);border-radius:18px;box-shadow:0 6px 0 var(--blue-d);padding:8px;display:flex;flex-direction:column;gap:2px}
+#bgMenu[hidden]{display:none}
+.bgi{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:12px;padding:6px 10px;cursor:pointer;text-align:left;color:var(--ink);font-weight:700}
+.bgi:hover{background:rgba(255,255,255,.6)}
+.bgi.on{background:rgba(255,255,255,.9)}
+.bgi .ck{width:1.1em;flex:none;color:var(--green-t);font-weight:900}
+.bgi .sw{width:30px;height:30px;flex:none;border-radius:9px;border:2px solid rgba(63,84,104,.35)}
+.bgi .hx{margin-left:auto;font-size:.8rem;color:var(--mut);font-weight:600;font-variant-numeric:tabular-nums}
+#bgDot{display:inline-block;width:.9em;height:.9em;border-radius:50%;border:2px solid rgba(63,84,104,.45);vertical-align:-.12em;margin-right:.35em}
+
+/* 物件顏色圓圈與選色小視窗 */
+.cpick{position:absolute;z-index:3;width:24px;height:24px;padding:0;border-radius:50%;border:3px solid rgba(63,84,104,.55);background:var(--ck,#fff);background-size:cover;cursor:pointer;box-shadow:0 2px 0 rgba(63,84,104,.25);transition:transform .1s}
+.cpick:hover{transform:scale(1.18)}
+.cpick.tl{top:12px;left:14px}
+.cpick.tr{top:10px;right:14px}
+.blk .cpick{top:8px;right:10px;width:20px;height:20px;border-width:2px}
+.skinned{background-color:var(--ck)!important;background-size:cover!important;background-position:center!important;border-color:color-mix(in srgb,var(--ck) 78%,#000)!important;color:var(--ink)}
+.card.skinned{box-shadow:0 6px 0 color-mix(in srgb,var(--ck) 78%,#000)!important}
+.blk.skinned{box-shadow:0 5px 0 color-mix(in srgb,var(--ck) 78%,#000)!important}
+.blk.skinned.cur{box-shadow:inset 0 0 0 4px #ff8fab,0 5px 0 color-mix(in srgb,var(--ck) 78%,#000)!important}
+.skinned .zb .btn,header.skinned .btn,footer.skinned .btn,footer.skinned .tab{--ink:#3f5468}
+.cpick.inl{position:static;flex:none}
+footer .cpick.inl{grid-column:3;justify-self:end}
+@media(max-width:820px){footer .cpick.inl{grid-column:1;justify-self:center}}
+#skinMenu{position:fixed;z-index:950;min-width:240px;max-height:calc(100vh - 16px);overflow:auto;background:var(--blue);border:3px solid var(--blue-d);border-radius:18px;box-shadow:0 6px 0 var(--blue-d);padding:8px;display:flex;flex-direction:column;gap:2px}
+#skinMenu[hidden]{display:none}
+.pmt{font-weight:800;font-size:.85rem;color:var(--mut);padding:2px 10px 6px}
+.psep{height:2px;background:rgba(63,84,104,.15);margin:4px 6px;flex:none}
+.bgi .sw.up{display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(255,255,255,.7)}
+
+/* 時間到提示 */
+#tuOverlay{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(140,185,215,.55);padding:16px;cursor:pointer}
+#tuOverlay[hidden]{display:none}
+#tuBox{background:var(--pink);border:6px solid var(--pink-d);border-radius:36px;box-shadow:0 10px 0 var(--pink-d);padding:clamp(24px,5vw,56px) clamp(28px,7vw,90px);text-align:center;animation:tuPop .4s ease-out;max-width:100%}
+#tuBox .bell{display:inline-block;font-size:clamp(3rem,10vw,6rem);line-height:1;animation:ring .5s ease-in-out infinite}
+#tuBox .big{font-size:clamp(2.2rem,8vw,5.5rem);font-weight:900;color:var(--pink-t);line-height:1.25}
+#tuSub{font-size:clamp(1rem,2.5vw,1.6rem);font-weight:700;color:var(--mut);margin-top:8px}
+@keyframes tuPop{from{transform:scale(.6);opacity:0}}
+@keyframes ring{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+
+@media(max-width:820px){
+  body{height:auto;min-height:100vh}
+  main{grid-template-columns:1fr;grid-template-rows:none}
+  .col{min-height:auto}
+  .col.L{min-height:440px}
+  #noticeCard{min-height:220px}
+  #subRow{min-height:150px}
+  footer{grid-template-columns:1fr;justify-items:center}
+  #tabs{grid-column:1}
+}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header id=&quot;topBar&quot;&gt;
+  &lt;div class=&quot;logo&quot;&gt;&lt;span&gt;&lt;svg width=&quot;38&quot; height=&quot;44&quot; viewBox=&quot;0 0 38 44&quot; aria-hidden=&quot;true&quot;&gt;&lt;g transform=&quot;rotate(-6 19 22)&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;2&quot; width=&quot;32&quot; height=&quot;40&quot; rx=&quot;4&quot; fill=&quot;#fff&quot; stroke=&quot;#5a4636&quot; stroke-width=&quot;2.2&quot;/&gt;&lt;path d=&quot;M8 11h14M8 16h10M8 38h22&quot; stroke=&quot;#cdbfae&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;text x=&quot;20&quot; y=&quot;31&quot; text-anchor=&quot;middle&quot; font-family=&quot;Arial Black,Arial,sans-serif&quot; font-weight=&quot;900&quot; font-size=&quot;15&quot; fill=&quot;#ff4d6d&quot; stroke=&quot;#ff4d6d&quot; stroke-width=&quot;.4&quot; transform=&quot;rotate(-8 20 27)&quot;&gt;100&lt;/text&gt;&lt;path d=&quot;M9 33.5q11 4 22-1&quot; stroke=&quot;#ff4d6d&quot; stroke-width=&quot;1.8&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/g&gt;&lt;/svg&gt;&lt;/span&gt; 考試工具&lt;/div&gt;
+  &lt;button class=&quot;btn sky&quot; onclick=&quot;exportData()&quot;&gt;📤 匯出&lt;/button&gt;
+  &lt;button class=&quot;btn sky&quot; onclick=&quot;document.getElementById(&#x27;file&#x27;).click()&quot;&gt;📥 匯入&lt;/button&gt;
+  &lt;span id=&quot;bgWrap&quot;&gt;&lt;button class=&quot;btn mint&quot; id=&quot;bgBtn&quot; onclick=&quot;toggleBgMenu(event)&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;false&quot; title=&quot;更換背景顏色&quot;&gt;&lt;span id=&quot;bgDot&quot;&gt;&lt;/span&gt;背景 ▾&lt;/button&gt;&lt;div id=&quot;bgMenu&quot; hidden role=&quot;menu&quot;&gt;&lt;/div&gt;&lt;/span&gt;
+  &lt;span class=&quot;sp&quot;&gt;&lt;/span&gt;
+  &lt;input id=&quot;title&quot; title=&quot;點一下可重新命名&quot; oninput=&quot;cur().title=this.value;save()&quot;&gt;
+  &lt;button class=&quot;cpick inl&quot; data-sk=&quot;header&quot; title=&quot;更換工具列的顏色&quot; aria-label=&quot;更換工具列顏色&quot;&gt;&lt;/button&gt;
+  &lt;input type=&quot;file&quot; id=&quot;file&quot; accept=&quot;.json&quot; hidden onchange=&quot;importData(this)&quot;&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+  &lt;div class=&quot;col L&quot;&gt;
+    &lt;div class=&quot;card&quot; id=&quot;nowCard&quot;&gt;
+      &lt;button class=&quot;cpick tl&quot; data-sk=&quot;now&quot; title=&quot;更換這個區塊的顏色&quot; aria-label=&quot;更換顏色&quot;&gt;&lt;/button&gt;
+      &lt;div class=&quot;zb&quot;&gt;&lt;button class=&quot;btn sky&quot; onclick=&quot;zoom(&#x27;now&#x27;,1)&quot; title=&quot;放大考試科目的字&quot;&gt;A+&lt;/button&gt;&lt;button class=&quot;btn sky&quot; onclick=&quot;zoom(&#x27;now&#x27;,-1)&quot; title=&quot;縮小考試科目的字&quot;&gt;A-&lt;/button&gt;&lt;/div&gt;
+      &lt;div id=&quot;now&quot;&gt;&lt;/div&gt;
+      &lt;div id=&quot;barBox&quot;&gt;&lt;div id=&quot;bar-label&quot;&gt;⚡ 能量條&lt;/div&gt;&lt;div class=&quot;bar-wrap&quot;&gt;&lt;div id=&quot;bar&quot;&gt;&lt;/div&gt;&lt;div id=&quot;barTxt&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;card&quot; id=&quot;clockCard&quot;&gt;&lt;button class=&quot;cpick tr&quot; data-sk=&quot;clock&quot; title=&quot;更換這個區塊的顏色&quot; aria-label=&quot;更換顏色&quot;&gt;&lt;/button&gt;&lt;div id=&quot;clock&quot;&gt;00&lt;i&gt;:&lt;/i&gt;00&lt;i&gt;:&lt;/i&gt;00&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;col R&quot;&gt;
+    &lt;div id=&quot;att&quot;&gt;
+      &lt;div class=&quot;abox&quot;&gt;&lt;label for=&quot;a_should&quot;&gt;應到&lt;/label&gt;&lt;input id=&quot;a_should&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;1&quot; value=&quot;0&quot; inputmode=&quot;numeric&quot; oninput=&quot;attIn(&#x27;should&#x27;)&quot; onchange=&quot;attFix(&#x27;should&#x27;)&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;abox a2&quot;&gt;&lt;label for=&quot;a_here&quot;&gt;已到&lt;/label&gt;&lt;input id=&quot;a_here&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;1&quot; value=&quot;0&quot; inputmode=&quot;numeric&quot; oninput=&quot;attIn(&#x27;here&#x27;)&quot; onchange=&quot;attFix(&#x27;here&#x27;)&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;abox a3&quot;&gt;&lt;label for=&quot;a_absent&quot;&gt;未到&lt;/label&gt;&lt;input id=&quot;a_absent&quot; type=&quot;number&quot; min=&quot;0&quot; step=&quot;1&quot; value=&quot;0&quot; inputmode=&quot;numeric&quot; oninput=&quot;attIn(&#x27;absent&#x27;)&quot; onchange=&quot;attFix(&#x27;absent&#x27;)&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;card&quot; id=&quot;noticeCard&quot;&gt;
+      &lt;button class=&quot;cpick tl&quot; data-sk=&quot;notice&quot; title=&quot;更換這個區塊的顏色&quot; aria-label=&quot;更換顏色&quot;&gt;&lt;/button&gt;
+      &lt;div class=&quot;zb&quot;&gt;&lt;button class=&quot;btn pink&quot; onclick=&quot;zoom(&#x27;notice&#x27;,1)&quot; title=&quot;放大公告的字&quot;&gt;A+&lt;/button&gt;&lt;button class=&quot;btn pink&quot; onclick=&quot;zoom(&#x27;notice&#x27;,-1)&quot; title=&quot;縮小公告的字&quot;&gt;A-&lt;/button&gt;&lt;/div&gt;
+      &lt;div class=&quot;ntitle&quot;&gt;📢 公告&lt;/div&gt;
+      &lt;textarea id=&quot;notice&quot; placeholder=&quot;在這裡寫公告、考試規則…&quot; oninput=&quot;cur().notice=this.value;save()&quot;&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id=&quot;subRow&quot;&gt;&lt;/div&gt;
+&lt;/main&gt;
+
+&lt;footer id=&quot;botBar&quot;&gt;&lt;div id=&quot;footBtns&quot;&gt;&lt;button class=&quot;btn pink&quot; id=&quot;resetBtn&quot; onclick=&quot;resetAll()&quot;&gt;🔄 重設&lt;/button&gt;&lt;/div&gt;&lt;div id=&quot;tabs&quot;&gt;&lt;/div&gt;&lt;button class=&quot;cpick inl&quot; data-sk=&quot;footer&quot; title=&quot;更換工具列的顏色&quot; aria-label=&quot;更換工具列顏色&quot;&gt;&lt;/button&gt;&lt;/footer&gt;
+
+&lt;input type=&quot;file&quot; id=&quot;imgIn&quot; accept=&quot;image/*&quot; hidden&gt;
+&lt;div id=&quot;skinMenu&quot; hidden role=&quot;menu&quot;&gt;&lt;/div&gt;
+
+&lt;div id=&quot;mdOverlay&quot; hidden&gt;&lt;div id=&quot;md&quot; role=&quot;dialog&quot; aria-modal=&quot;true&quot;&gt;
+  &lt;div class=&quot;mdh&quot;&gt;&lt;span id=&quot;mdTitle&quot;&gt;編輯科目&lt;/span&gt;&lt;button class=&quot;mdDel&quot; id=&quot;mdDel&quot; onclick=&quot;mdDelete()&quot;&gt;🗑️ 刪除&lt;/button&gt;&lt;/div&gt;
+  &lt;label class=&quot;mf&quot;&gt;科目&lt;input id=&quot;mdName&quot; placeholder=&quot;例如：國文&quot; maxlength=&quot;20&quot;&gt;&lt;/label&gt;
+  &lt;div class=&quot;mf&quot;&gt;開始時間&lt;div class=&quot;tm&quot;&gt;&lt;input id=&quot;mdSh&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;23&quot; placeholder=&quot;時&quot;&gt;&lt;b&gt;:&lt;/b&gt;&lt;input id=&quot;mdSm&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;59&quot; placeholder=&quot;分&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;mf&quot;&gt;結束時間&lt;div class=&quot;tm&quot;&gt;&lt;input id=&quot;mdEh&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;23&quot; placeholder=&quot;時&quot;&gt;&lt;b&gt;:&lt;/b&gt;&lt;input id=&quot;mdEm&quot; type=&quot;number&quot; min=&quot;0&quot; max=&quot;59&quot; placeholder=&quot;分&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;mdb&quot;&gt;&lt;button class=&quot;btn pink&quot; onclick=&quot;mdClose()&quot;&gt;取消&lt;/button&gt;&lt;button class=&quot;btn mint&quot; onclick=&quot;mdOk()&quot;&gt;確定&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/div&gt;
+
+&lt;div id=&quot;tuOverlay&quot; hidden onclick=&quot;closeTU()&quot;&gt;&lt;div id=&quot;tuBox&quot;&gt;&lt;div class=&quot;bell&quot;&gt;🔔&lt;/div&gt;&lt;div class=&quot;big&quot;&gt;時間到 收卷囉！&lt;/div&gt;&lt;div id=&quot;tuSub&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;script&gt;
+const KEY=&quot;cuteExamTool_v1&quot;;
+let D=load(),active=D.days[0].id;
+function uid(){return&quot;x&quot;+Math.random().toString(36).slice(2,9)}
+function def(){return{fs:16,days:[{id:uid(),title:&quot;第1天段考&quot;,date:&quot;&quot;,notice:&quot;1. 桌面清空，只留文具\n2. 考試期間請保持安靜&quot;,subjects:[
+  {id:uid(),name:&quot;國文&quot;,start:&quot;08:40&quot;,end:&quot;09:30&quot;},{id:uid(),name:&quot;數學&quot;,start:&quot;09:50&quot;,end:&quot;10:40&quot;}]}]}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&amp;&amp;r.days&amp;&amp;r.days.length)return r}catch(e){}return def()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+function cur(){return D.days.find(d=&gt;d.id===active)||D.days[0]}
+const $=id=&gt;document.getElementById(id);
+const toMin=t=&gt;{if(!t)return null;const[a,b]=t.split(&quot;:&quot;);return+a*60+ +b};
+const pad=n=&gt;String(n).padStart(2,&quot;0&quot;);
+const fmtMin=m=&gt;pad(Math.floor(m/60))+&quot;:&quot;+pad(m%60);
+
+function applyZoom(){const r=document.documentElement.style;r.setProperty(&quot;--tn&quot;,D.tsNow||1);r.setProperty(&quot;--tc&quot;,D.tsNotice||1)}
+function zoom(k,n){ // k: &quot;now&quot; 考試科目 / &quot;notice&quot; 公告
+  const key=k===&quot;now&quot;?&quot;tsNow&quot;:&quot;tsNotice&quot;,lo=k===&quot;now&quot;?.3:.5,hi=3;
+  const el=k===&quot;now&quot;?document.querySelector(&quot;#now .nm&quot;):$(&quot;notice&quot;);
+  const px=()=&gt;el?parseFloat(getComputedStyle(el).fontSize):0;
+  const old=D[key]||1,before=px();
+  if(n&gt;0&amp;&amp;old&gt;=hi-1e-9){alert(&quot;字不能再大了&quot;);return}
+  if(n&lt;0&amp;&amp;old&lt;=lo+1e-9){alert(&quot;字不能再小了&quot;);return}
+  D[key]=Math.min(hi,Math.max(lo,old*(n&gt;0?1.12:1/1.12)));
+  applyZoom();fitNow();
+  if(n&gt;0&amp;&amp;px()&lt;=before+.5){ // 已放不下外框，字無法再變大
+    D[key]=old;applyZoom();fitNow();alert(&quot;字不能再大了&quot;);return}
+  save()}
+
+function renderTabs(){
+  $(&quot;tabs&quot;).innerHTML=&quot;&quot;;
+  D.days.forEach((d,i)=&gt;{
+    const b=document.createElement(&quot;button&quot;);b.className=&quot;tab&quot;+(d.id===active?&quot; on&quot;:&quot;&quot;);b.textContent=&quot;Day&quot;+(i+1);
+    if(d.id===active&amp;&amp;D.days.length&gt;1){const x=document.createElement(&quot;span&quot;);x.className=&quot;x&quot;;x.textContent=&quot;✕&quot;;x.title=&quot;刪除這一天&quot;;
+      x.onclick=e=&gt;{e.stopPropagation();if(confirm(&quot;確定刪除 Day&quot;+(i+1)+&quot; 嗎？&quot;)){D.days=D.days.filter(z=&gt;z.id!==d.id);active=D.days[0].id;save();renderAll()}};b.appendChild(x)}
+    b.onclick=()=&gt;{active=d.id;renderAll()};$(&quot;tabs&quot;).appendChild(b)});
+  const a=document.createElement(&quot;button&quot;);a.className=&quot;tab&quot;;a.textContent=&quot;＋新增考試日&quot;;
+  a.onclick=()=&gt;{const n=D.days.length+1;const d={id:uid(),title:&quot;第&quot;+n+&quot;天段考&quot;,date:&quot;&quot;,notice:&quot;&quot;,subjects:[]};D.days.push(d);active=d.id;save();renderAll()};
+  $(&quot;tabs&quot;).appendChild(a);
+}
+
+function sorted(){cur().subjects.sort((a,b)=&gt;(toMin(a.start)??9999)-(toMin(b.start)??9999))}
+let lastNow=null;
+function setNow(H){if(H!==lastNow){lastNow=H;$(&quot;now&quot;).innerHTML=&#x27;&lt;div class=&quot;ni&quot;&gt;&#x27;+H+&#x27;&lt;/div&gt;&#x27;;fitNow()}}
+function fitNow(){ // 確保現在考試的字放大後不超出外框（以文字區塊本身的大小判斷）
+  const b=$(&quot;now&quot;),ni=b.firstElementChild;if(!ni)return;let f=1;b.style.setProperty(&quot;--fit&quot;,1);
+  const pt=parseFloat(getComputedStyle(b).paddingTop)||0;
+  const over=()=&gt;{const r=ni.getBoundingClientRect();return r.height&gt;b.clientHeight-pt+1||r.width&gt;b.clientWidth+1||ni.scrollWidth&gt;b.clientWidth+1};
+  for(let i=0;i&lt;120&amp;&amp;f&gt;.12&amp;&amp;over();i++){f*=.98;b.style.setProperty(&quot;--fit&quot;,f)}
+}
+addEventListener(&quot;resize&quot;,fitNow);
+try{new ResizeObserver(fitNow).observe($(&quot;now&quot;))}catch(e){}
+if(document.fonts&amp;&amp;document.fonts.ready)document.fonts.ready.then(fitNow);
+
+function renderRows(){
+  sorted();const row=$(&quot;subRow&quot;);row.innerHTML=&quot;&quot;;const d=cur();
+  if(!d.subjects.length){const e=document.createElement(&quot;div&quot;);e.className=&quot;empty&quot;;e.textContent=&quot;🌱 還沒有科目，按右邊「＋」新增吧！&quot;;row.appendChild(e)}
+  d.subjects.forEach((s,i)=&gt;{
+    const b=document.createElement(&quot;div&quot;);b.className=&quot;blk c&quot;+(i%3);b.id=&quot;r_&quot;+s.id;b.tabIndex=0;b.title=&quot;點一下編輯&quot;;
+    b.innerHTML=&#x27;&lt;button class=&quot;cpick&quot; title=&quot;更換這個方塊的顏色&quot; aria-label=&quot;更換顏色&quot;&gt;&lt;/button&gt;&lt;div class=&quot;bn&quot;&gt;&lt;/div&gt;&lt;div class=&quot;bm&quot;&gt;&lt;div class=&quot;bt&quot;&gt;&lt;span&gt;&lt;/span&gt; &lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;span class=&quot;badge&quot;&gt;&lt;/span&gt;&lt;/div&gt;&#x27;;
+    b.querySelector(&quot;.bn&quot;).textContent=s.name||&quot;（未命名）&quot;;
+    const sp=b.querySelectorAll(&quot;.bt span&quot;);sp[0].textContent=s.start||&quot;--:--&quot;;sp[1].textContent=&quot;~ &quot;+(s.end||&quot;--:--&quot;);
+    b.onclick=()=&gt;openModal(s.id);
+    b.onkeydown=e=&gt;{if(e.target!==b)return;if(e.key===&quot;Enter&quot;||e.key===&quot; &quot;){e.preventDefault();openModal(s.id)}};
+    b.querySelector(&quot;.cpick&quot;).onclick=e=&gt;{e.stopPropagation();openSkin(&quot;s_&quot;+s.id,e.currentTarget)};
+    applySkin(b,&quot;s_&quot;+s.id);
+    row.appendChild(b)});
+  const p=document.createElement(&quot;button&quot;);p.className=&quot;blk plus&quot;;p.textContent=&quot;＋&quot;;p.title=&quot;新增科目&quot;;p.onclick=()=&gt;openModal(null);row.appendChild(p);
+}
+
+// ===== 新增 / 編輯科目小視窗 =====
+let MD=null;
+function setTm(h,m,t){const v=toMin(t);$(h).value=v==null?&quot;&quot;:pad(Math.floor(v/60));$(m).value=v==null?&quot;&quot;:pad(v%60)}
+function getTm(h,m){const a=$(h).value,b=$(m).value;if(a===&quot;&quot;||b===&quot;&quot;)return null;return pad(Math.min(23,Math.max(0,+a)))+&quot;:&quot;+pad(Math.min(59,Math.max(0,+b)))}
+function wireTm(hid,mid){
+  const h=$(hid),m=$(mid);
+  h.onkeydown=e=&gt;{if(e.key!==&quot;ArrowUp&quot;&amp;&amp;e.key!==&quot;ArrowDown&quot;)return;e.preventDefault();
+    const d=e.key===&quot;ArrowUp&quot;?1:-1;h.value=pad(((+h.value||0)+d+24)%24)};
+  m.onkeydown=e=&gt;{if(e.key!==&quot;ArrowUp&quot;&amp;&amp;e.key!==&quot;ArrowDown&quot;)return;e.preventDefault();
+    const d=e.key===&quot;ArrowUp&quot;?1:-1;let v=(+m.value||0)+d,hh=+h.value||0;
+    if(v&gt;59){v-=60;hh=(hh+1)%24}else if(v&lt;0){v+=60;hh=(hh+23)%24}
+    h.value=pad(hh);m.value=pad(v)};
+  h.onchange=()=&gt;{if(h.value!==&quot;&quot;)h.value=pad(Math.min(23,Math.max(0,+h.value)))};
+  m.onchange=()=&gt;{if(m.value!==&quot;&quot;)m.value=pad(Math.min(59,Math.max(0,+m.value)))};
+}
+wireTm(&quot;mdSh&quot;,&quot;mdSm&quot;);wireTm(&quot;mdEh&quot;,&quot;mdEm&quot;);
+function openModal(id){
+  const d=cur();MD={id};
+  let s=id?d.subjects.find(z=&gt;z.id===id):null;
+  if(!s){const last=d.subjects[d.subjects.length-1];
+    const st=Math.min(last&amp;&amp;last.end?toMin(last.end)+10:8*60+40,23*60+19);
+    s={name:&quot;&quot;,start:fmtMin(st),end:fmtMin(st+40)}}
+  $(&quot;mdTitle&quot;).textContent=id?&quot;編輯科目&quot;:&quot;新增科目&quot;;$(&quot;mdDel&quot;).hidden=!id;
+  $(&quot;mdName&quot;).value=s.name||&quot;&quot;;setTm(&quot;mdSh&quot;,&quot;mdSm&quot;,s.start);setTm(&quot;mdEh&quot;,&quot;mdEm&quot;,s.end);
+  $(&quot;mdOverlay&quot;).hidden=false;$(&quot;mdName&quot;).focus();$(&quot;mdName&quot;).select();
+}
+function mdClose(){$(&quot;mdOverlay&quot;).hidden=true;MD=null}
+function mdOk(){
+  if(!MD)return;const d=cur(),name=$(&quot;mdName&quot;).value.trim(),a=getTm(&quot;mdSh&quot;,&quot;mdSm&quot;),b=getTm(&quot;mdEh&quot;,&quot;mdEm&quot;);
+  if(!a||!b){alert(&quot;請輸入完整的開始與結束時間&quot;);return}
+  if(toMin(b)&lt;=toMin(a)){alert(&quot;結束時間要晚於開始時間&quot;);return}
+  const s=MD.id&amp;&amp;d.subjects.find(z=&gt;z.id===MD.id);
+  if(s){s.name=name;s.start=a;s.end=b}else d.subjects.push({id:uid(),name:name||&quot;新科目&quot;,start:a,end:b});
+  save();mdClose();renderRows();tick();
+}
+function mdDelete(){
+  if(!MD||!MD.id)return;const d=cur(),s=d.subjects.find(z=&gt;z.id===MD.id);
+  if(s&amp;&amp;confirm(&quot;刪除「&quot;+(s.name||&quot;這個科目&quot;)+&quot;」？&quot;)){d.subjects=d.subjects.filter(z=&gt;z.id!==s.id);save();mdClose();renderRows();tick()}
+}
+document.addEventListener(&quot;keydown&quot;,e=&gt;{
+  if($(&quot;mdOverlay&quot;).hidden)return;
+  if(e.key===&quot;Escape&quot;)mdClose();
+  else if(e.key===&quot;Enter&quot;&amp;&amp;e.target.tagName!==&quot;BUTTON&quot;)mdOk();
+});
+$(&quot;mdOverlay&quot;).addEventListener(&quot;mousedown&quot;,e=&gt;{if(e.target===$(&quot;mdOverlay&quot;))mdClose()});
+
+// status: 0 wait, 1 on, 2 end
+function dayMode(d,now){return&quot;today&quot;; // before/after/today
+  if(!d.date)return&quot;today&quot;;
+  const t=now.getFullYear()+&quot;-&quot;+pad(now.getMonth()+1)+&quot;-&quot;+pad(now.getDate());
+  return d.date&lt;t?&quot;past&quot;:d.date&gt;t?&quot;future&quot;:&quot;today&quot;;
+}
+function status(s,mode,m){
+  if(mode===&quot;past&quot;)return 2;if(mode===&quot;future&quot;)return 0;
+  const a=toMin(s.start),b=toMin(s.end);
+  if(a==null||b==null)return 0;
+  return m&lt;a?0:m&gt;=b?2:1;
+}
+const ST=[[&quot;尚未開始&quot;,&quot;s-wait&quot;],[&quot;考試中&quot;,&quot;s-on&quot;],[&quot;已結束&quot;,&quot;s-end&quot;]];
+
+function tick(){
+  const now=new Date(),d=cur(),mode=dayMode(d,now);
+  const sec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds(),m=sec/60;
+  $(&quot;clock&quot;).innerHTML=`${pad(now.getHours())}&lt;i&gt;:&lt;/i&gt;${pad(now.getMinutes())}&lt;i&gt;:&lt;/i&gt;${pad(now.getSeconds())}`;
+  let on=null,next=null;
+  d.subjects.forEach(s=&gt;{
+    const st=status(s,mode,m),tr=$(&quot;r_&quot;+s.id);
+    if(tr){const b=tr.querySelector(&quot;.badge&quot;);b.textContent=ST[st][0];b.className=&quot;badge &quot;+ST[st][1];tr.classList.toggle(&quot;cur&quot;,st===1)}
+    if(mode===&quot;today&quot;){const e=toMin(s.end);
+      if(e!=null&amp;&amp;sec&gt;=e*60&amp;&amp;sec&lt;e*60+5&amp;&amp;!fired[s.id]){fired[s.id]=1;timesUp(s.name)}}
+    if(st===1&amp;&amp;!on)on=s;
+    if(st===0&amp;&amp;mode===&quot;today&quot;&amp;&amp;toMin(s.start)!=null&amp;&amp;!next)next=s;
+  });
+  const bar=$(&quot;bar&quot;),txt=$(&quot;barTxt&quot;),lab=$(&quot;bar-label&quot;);
+  let H=&quot;&quot;,pct=0,t=&quot;&quot;,low=false,L=&quot;⚡ 能量條&quot;;
+  const msg=(x,y)=&gt;`&lt;div class=&quot;nm&quot;&gt;${x}&lt;/div&gt;`+(y?`&lt;small&gt;${y}&lt;/small&gt;`:&quot;&quot;);
+  if(mode===&quot;past&quot;){H=msg(&quot;🎉 這一天已經考完囉&quot;);t=&quot;已結束&quot;}
+  else if(mode===&quot;future&quot;){H=msg(&quot;📅 這天還沒到喔&quot;,esc(d.date));t=&quot;尚未開始&quot;}
+  else if(on){
+    const a=toMin(on.start)*60,b=toMin(on.end)*60,left=Math.max(0,b-sec);
+    H=msg(esc(on.name||&quot;（未命名）&quot;),on.start+&quot; ~ &quot;+on.end);
+    pct=left/(b-a)*100;low=left&lt;600;L=&quot;⚡ 考試剩餘時間&quot;;t=&quot;剩 &quot;+Math.floor(left/60)+&quot; 分 &quot;+pad(left%60)+&quot; 秒&quot;;
+  }else if(next){
+    const a=toMin(next.start)*60,left=a-sec;
+    const prev=d.subjects.filter(s=&gt;status(s,mode,m)===2).map(s=&gt;toMin(s.end)*60).sort((x,y)=&gt;y-x)[0];
+    H=msg(prev!=null?&quot;☕ 休息時間&quot;:&quot;🌤️ 考試尚未開始&quot;,&quot;下一科：&quot;+esc(next.name)+&quot;（&quot;+next.start+&quot;）&quot;);
+    const span=prev!=null?a-prev:Math.max(left,1800);pct=Math.min(100,left/span*100);
+    L=&quot;⚡ 距離下一科&quot;;t=&quot;還有 &quot;+Math.floor(left/60)+&quot; 分 &quot;+pad(left%60)+&quot; 秒&quot;;
+  }else{
+    H=msg(d.subjects.length?&quot;🎉 今天的考試都結束了&quot;:&quot;🌱 今天還沒有安排科目&quot;)}
+  lab.textContent=L;setNow(H);
+  bar.style.width=pct+&quot;%&quot;;bar.classList.toggle(&quot;low&quot;,low);txt.textContent=t;
+}
+// ===== 時間到：跳出提示並響叮叮聲（持續 5 秒）=====
+let AC=null,master=null,tUp=null;const fired={};
+function unlock(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state===&quot;suspended&quot;)AC.resume()}catch(e){}}
+[&quot;pointerdown&quot;,&quot;keydown&quot;,&quot;touchstart&quot;].forEach(e=&gt;addEventListener(e,unlock,{passive:true}));
+function ding(t){
+  [[1318.5,.6],[2637,.2],[3951,.08]].forEach(([f,g])=&gt;{
+    const o=AC.createOscillator(),v=AC.createGain();o.type=&quot;sine&quot;;o.frequency.value=f;
+    v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.005);v.gain.exponentialRampToValueAtTime(.0001,t+.8);
+    o.connect(v);v.connect(master);o.start(t);o.stop(t+.85)})
+}
+function timesUp(name){
+  closeTU();
+  $(&quot;tuSub&quot;).textContent=name?name+&quot; 考試結束&quot;:&quot;&quot;;$(&quot;tuOverlay&quot;).hidden=false;
+  tUp=setTimeout(closeTU,5000);
+  unlock();
+  if(AC){try{
+    master=AC.createGain();master.gain.value=.5;master.connect(AC.destination);
+    const t=AC.currentTime+.05;
+    for(let i=0;i&lt;4;i++){ding(t+i*1.25);ding(t+i*1.25+.38)}
+  }catch(e){}}
+}
+function closeTU(){
+  clearTimeout(tUp);$(&quot;tuOverlay&quot;).hidden=true;
+  if(master){try{master.gain.value=0;master.disconnect()}catch(e){}master=null}
+}
+function esc(s){return String(s).replace(/[&amp;&lt;&gt;]/g,c=&gt;({&quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;}[c]))}
+
+let attT=null;
+function attIn(k){
+  const a=cur().att||(cur().att={});
+  if(k!==&quot;absent&quot;){
+    const sh=$(&quot;a_should&quot;).value,he=$(&quot;a_here&quot;).value;
+    if(sh!==&quot;&quot;&amp;&amp;he!==&quot;&quot;)$(&quot;a_absent&quot;).value=String(Math.max(0,+sh-+he));
+  }
+  [&quot;should&quot;,&quot;here&quot;,&quot;absent&quot;].forEach(x=&gt;a[x]=$(&quot;a_&quot;+x).value);
+  save();
+  clearTimeout(attT);attT=setTimeout(attCheck,3000); // 輸入完 3 秒後檢查
+}
+function attFix(k){if($(&quot;a_&quot;+k).value===&quot;&quot;){$(&quot;a_&quot;+k).value=&quot;0&quot;;attIn(k)}}
+function attCheck(){
+  const v=[&quot;should&quot;,&quot;here&quot;,&quot;absent&quot;].map(x=&gt;$(&quot;a_&quot;+x).value);
+  if(v.some(x=&gt;x===&quot;&quot;))return;
+  if(+v[1]+ +v[2]&gt;+v[0]){
+    alert(&quot;已到加未到超過應到的呦&quot;);
+    $(&quot;a_here&quot;).value=v[0];$(&quot;a_absent&quot;).value=&quot;0&quot;;
+    attIn(&quot;absent&quot;);
+  }
+}
+function toggleFull(){
+  const el=document.documentElement,on=document.fullscreenElement||document.webkitFullscreenElement;
+  try{
+    if(on){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}
+    else if(el.requestFullscreen||el.webkitRequestFullscreen){(el.requestFullscreen||el.webkitRequestFullscreen).call(el)}
+    else alert(&quot;這個瀏覽器不支援全螢幕 😢&quot;)
+  }catch(e){alert(&quot;無法進入全螢幕 😢&quot;)}
+}
+function fsLabel(){$(&quot;fsBtn&quot;).textContent=(document.fullscreenElement||document.webkitFullscreenElement)?&quot;🗗 退出全螢幕&quot;:&quot;⛶ 全螢幕&quot;}
+document.addEventListener(&quot;fullscreenchange&quot;,fsLabel);document.addEventListener(&quot;webkitfullscreenchange&quot;,fsLabel);
+
+function renderAll(){
+  const d=cur();clearTimeout(attT);lastNow=null;
+  [&quot;should&quot;,&quot;here&quot;,&quot;absent&quot;].forEach(k=&gt;{$(&quot;a_&quot;+k).value=(d.att&amp;&amp;d.att[k])||&quot;0&quot;});$(&quot;title&quot;).value=d.title;$(&quot;notice&quot;).value=d.notice||&quot;&quot;;
+  applyZoom();
+  renderTabs();renderRows();tick();save();
+}
+
+function resetAll(){
+  if(!confirm(&quot;確定要重設嗎？所有考試日、科目、公告、字體大小、背景和各區塊的顏色都會恢復成預設內容。&quot;))return;
+  D=def();active=D.days[0].id;save();
+  bgNow={t:&quot;c&quot;,v:BGS[0][1]};SK={};closeSkin();closeBg(); // 背景與各區塊顏色/圖片也一併重設
+  try{localStorage.removeItem(BG_KEY);localStorage.removeItem(SK_KEY)}catch(e){}
+  applyBg();applyStaticSkins();renderAll();
+}
+function exportData(){
+  const j=JSON.stringify(D,null,2);
+  try{const a=document.createElement(&quot;a&quot;);a.href=URL.createObjectURL(new Blob([j],{type:&quot;application/json&quot;}));a.download=&quot;exam-data.json&quot;;a.click()}catch(e){}
+  try{navigator.clipboard.writeText(j)}catch(e){}
+}
+function importData(el){
+  const f=el.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=&gt;{try{const o=JSON.parse(r.result);if(!o.days||!o.days.length)throw 0;D=o;active=D.days[0].id;renderAll()}catch(e){alert(&quot;檔案格式不正確 😢&quot;)}};
+  r.readAsText(f);el.value=&quot;&quot;;
+}
+// ===== 顏色 / 圖片選擇（背景與各物件共用）=====
+const BG_KEY=&quot;cuteExamTool_bg&quot;,SK_KEY=&quot;cuteExamTool_skin&quot;;
+const BGS=[[&quot;預設黃&quot;,&quot;#FFFDD0&quot;],[&quot;粉紅&quot;,&quot;#FDEBF3&quot;],[&quot;橘色&quot;,&quot;#FB966E&quot;],[&quot;綠色&quot;,&quot;#DDF4E8&quot;],[&quot;藍色&quot;,&quot;#DDF0FB&quot;],[&quot;紫色&quot;,&quot;#B28FCE&quot;],[&quot;米色&quot;,&quot;#F9E9CD&quot;]];
+const okVal=(o,k)=&gt;o&amp;&amp;((o.t===&quot;c&quot;&amp;&amp;BGS.some(x=&gt;x[1]===o.v))||(o.t===&quot;i&quot;&amp;&amp;typeof o.v===&quot;string&quot;&amp;&amp;o.v.startsWith(&quot;data:image/&quot;)));
+let bgNow={t:&quot;c&quot;,v:BGS[0][1]},SK={};
+try{const raw=localStorage.getItem(BG_KEY);if(raw){const o=raw[0]===&quot;#&quot;?{t:&quot;c&quot;,v:raw}:JSON.parse(raw);if(okVal(o))bgNow=o}}catch(e){}
+try{const o=JSON.parse(localStorage.getItem(SK_KEY));if(o&amp;&amp;typeof o===&quot;object&quot;){SK={};for(const k in o)if(okVal(o[k])&amp;&amp;!((k===&quot;header&quot;||k===&quot;footer&quot;)&amp;&amp;o[k].t===&quot;i&quot;))SK[k]=o[k]}}catch(e){}
+function saveBg(){try{localStorage.setItem(BG_KEY,JSON.stringify(bgNow))}catch(e){alert(&quot;圖片太大，無法儲存（重新整理後會恢復）&quot;)}}
+function saveSk(){try{localStorage.setItem(SK_KEY,JSON.stringify(SK))}catch(e){alert(&quot;圖片太大，無法儲存（重新整理後會恢復）&quot;)}}
+
+function pickImage(max,cb){
+  const inp=$(&quot;imgIn&quot;);
+  inp.onchange=()=&gt;{
+    const f=inp.files[0];inp.value=&quot;&quot;;if(!f)return;
+    const r=new FileReader();
+    r.onerror=()=&gt;alert(&quot;圖片讀取失敗 😢&quot;);
+    r.onload=()=&gt;{const im=new Image();
+      im.onerror=()=&gt;alert(&quot;圖片讀取失敗 😢&quot;);
+      im.onload=()=&gt;{ // 縮小後再存，避免佔太多空間
+        const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement(&quot;canvas&quot;);
+        c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+        const x=c.getContext(&quot;2d&quot;);x.fillStyle=&quot;#fff&quot;;x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+        cb(c.toDataURL(&quot;image/jpeg&quot;,.82))};
+      im.src=r.result};
+    r.readAsDataURL(f)};
+  inp.click();
+}
+// 在選單中列出 9 個顏色（含預覽）、上傳圖片，物件選單另有「恢復預設」
+function fillMenu(m,cur,onColor,onImg,onReset){
+  m.innerHTML=&quot;&quot;;
+  const add=(ck,swCss,swTxt,name,hex,fn)=&gt;{
+    const b=document.createElement(&quot;button&quot;);b.className=&quot;bgi&quot;+(ck?&quot; on&quot;:&quot;&quot;);b.setAttribute(&quot;role&quot;,&quot;menuitem&quot;);
+    b.innerHTML=&#x27;&lt;span class=&quot;ck&quot;&gt;&lt;/span&gt;&lt;span class=&quot;sw&quot;&gt;&lt;/span&gt;&lt;span class=&quot;bn2&quot;&gt;&lt;/span&gt;&lt;span class=&quot;hx&quot;&gt;&lt;/span&gt;&#x27;;
+    b.querySelector(&quot;.ck&quot;).textContent=ck?&quot;✓&quot;:&quot;&quot;;
+    const sw=b.querySelector(&quot;.sw&quot;);if(swCss)sw.style.background=swCss;if(swTxt){sw.classList.add(&quot;up&quot;);sw.textContent=swTxt}
+    b.querySelector(&quot;.bn2&quot;).textContent=name;b.querySelector(&quot;.hx&quot;).textContent=hex||&quot;&quot;;
+    b.onclick=e=&gt;{e.stopPropagation();fn()};m.appendChild(b)};
+  BGS.forEach(([n,c])=&gt;add(cur&amp;&amp;cur.t===&quot;c&quot;&amp;&amp;cur.v===c,c,&quot;&quot;,n,c,()=&gt;onColor(c)));
+  const sep=document.createElement(&quot;div&quot;);sep.className=&quot;psep&quot;;m.appendChild(sep);
+  if(onImg)add(cur&amp;&amp;cur.t===&quot;i&quot;,null,&quot;🖼️&quot;,&quot;上傳圖片&quot;,&quot;&quot;,onImg);
+  if(onReset)add(!cur,null,&quot;↩️&quot;,&quot;恢復預設&quot;,&quot;&quot;,onReset);
+}
+
+// ----- 背景 -----
+function applyBg(){
+  const r=document.documentElement.style;
+  if(bgNow.t===&quot;i&quot;){r.setProperty(&quot;--bgimg&quot;,&#x27;url(&quot;&#x27;+bgNow.v+&#x27;&quot;)&#x27;);r.setProperty(&quot;--bg&quot;,BGS[0][1]);$(&quot;bgDot&quot;).style.background=&#x27;center/cover url(&quot;&#x27;+bgNow.v+&#x27;&quot;)&#x27;}
+  else{r.setProperty(&quot;--bgimg&quot;,&quot;none&quot;);r.setProperty(&quot;--bg&quot;,bgNow.v);$(&quot;bgDot&quot;).style.background=bgNow.v}
+  fillMenu($(&quot;bgMenu&quot;),bgNow,c=&gt;{bgNow={t:&quot;c&quot;,v:c};saveBg();applyBg();closeBg()},
+    ()=&gt;{closeBg();pickImage(1920,d=&gt;{bgNow={t:&quot;i&quot;,v:d};saveBg();applyBg()})});
+}
+function toggleBgMenu(e){e.stopPropagation();closeSkin();const m=$(&quot;bgMenu&quot;);m.hidden=!m.hidden;$(&quot;bgBtn&quot;).setAttribute(&quot;aria-expanded&quot;,String(!m.hidden))}
+function closeBg(){$(&quot;bgMenu&quot;).hidden=true;$(&quot;bgBtn&quot;).setAttribute(&quot;aria-expanded&quot;,&quot;false&quot;)}
+
+// ----- 各物件（現在考試、時鐘、公告、科目方塊）-----
+const SK_EL={now:&quot;nowCard&quot;,clock:&quot;clockCard&quot;,notice:&quot;noticeCard&quot;,header:&quot;topBar&quot;,footer:&quot;botBar&quot;};
+function isDark(hex){const n=parseInt(hex.slice(1),16),r=n&gt;&gt;16&amp;255,g=n&gt;&gt;8&amp;255,b=n&amp;255;return (.299*r+.587*g+.114*b)/255&lt;.5}
+function applySkin(el,key){
+  if(!el)return;const v=SK[key],st=el.style;
+  [&quot;--ck&quot;,&quot;--ink&quot;,&quot;--mut&quot;,&quot;background-image&quot;].forEach(p=&gt;st.removeProperty(p));
+  el.classList.toggle(&quot;skinned&quot;,!!v);if(!v)return;
+  if(v.t===&quot;c&quot;){st.setProperty(&quot;--ck&quot;,v.v);
+    if(isDark(v.v)){st.setProperty(&quot;--ink&quot;,&quot;#ffffff&quot;);st.setProperty(&quot;--mut&quot;,&quot;#d5dde5&quot;)}}
+  else{st.setProperty(&quot;--ck&quot;,&quot;#ffffff&quot;);
+    st.setProperty(&quot;background-image&quot;,&#x27;linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)),url(&quot;&#x27;+v.v+&#x27;&quot;)&#x27;)}
+}
+function applyStaticSkins(){for(const k in SK_EL)applySkin($(SK_EL[k]),k)}
+let skinKey=null;
+function closeSkin(){$(&quot;skinMenu&quot;).hidden=true;skinKey=null}
+function setSkin(key,val){
+  if(val)SK[key]=val;else delete SK[key];
+  saveSk();
+  if(SK_EL[key])applySkin($(SK_EL[key]),key);else applySkin($(&quot;r_&quot;+key.slice(2)),key);
+  closeSkin();
+}
+function openSkin(key,btn){
+  const m=$(&quot;skinMenu&quot;);
+  if(!m.hidden&amp;&amp;skinKey===key){closeSkin();return}
+  closeBg();skinKey=key;
+  const cur=SK[key],bar=key===&quot;header&quot;||key===&quot;footer&quot;; // 上下工具列只能選顏色
+  fillMenu(m,cur,c=&gt;setSkin(key,{t:&quot;c&quot;,v:c}),
+    bar?null:()=&gt;{closeSkin();pickImage(900,d=&gt;setSkin(key,{t:&quot;i&quot;,v:d}))},
+    ()=&gt;setSkin(key,null));
+  m.querySelector(&quot;.bgi .bn2&quot;).textContent=&quot;黃色&quot;; // 物件選單的第一項叫「黃色」（背景選單維持「預設黃」）
+  const t=document.createElement(&quot;div&quot;);t.className=&quot;pmt&quot;;t.textContent=bar?&quot;選擇工具列的顏色&quot;:&quot;選擇這個區塊的顏色&quot;;m.insertBefore(t,m.firstChild);
+  m.hidden=false;m.style.visibility=&quot;hidden&quot;;
+  const r=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight;
+  let x=Math.min(Math.max(8,r.left),innerWidth-w-8),y=r.bottom+8;
+  if(y+h&gt;innerHeight-8)y=Math.max(8,r.top-h-8);
+  m.style.left=x+&quot;px&quot;;m.style.top=y+&quot;px&quot;;m.style.visibility=&quot;&quot;;
+}
+document.querySelectorAll(&quot;[data-sk]&quot;).forEach(b=&gt;b.onclick=e=&gt;{e.stopPropagation();openSkin(b.dataset.sk,b)});
+document.addEventListener(&quot;click&quot;,e=&gt;{
+  if(!$(&quot;bgWrap&quot;).contains(e.target))closeBg();
+  if(!$(&quot;skinMenu&quot;).contains(e.target))closeSkin();
+});
+document.addEventListener(&quot;keydown&quot;,e=&gt;{if(e.key===&quot;Escape&quot;){closeBg();closeSkin()}});
+addEventListener(&quot;resize&quot;,closeSkin);
+applyStaticSkins();applyBg();
+renderAll();setInterval(tick,1000);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+<div class="card" style="margin-top:14px;text-align:center">
+  <a href="https://hihimax77.github.io/exam-tool/" target="_blank" rel="noopener" style="display:inline-block;background:var(--primary);color:#fff;font-weight:800;text-decoration:none;padding:12px 26px;border-radius:10px">🌐 前往考試工具網站</a>
+  <div class="muted" style="margin-top:8px">https://hihimax77.github.io/exam-tool/</div>
+</div>
+</section>
+
+<section id="assignment" class="page">
+<div class="card">
+<h2>📚 課堂作業收交清點</h2>
+<div class="row"><input id="assignmentClass" placeholder="班級"><input id="assignmentName" placeholder="作業名稱"><button onclick="addAssignment()">➕ 新增作業</button><select id="assignmentSelect" onchange="changeAssignment()"></select></div>
+<div class="assignment-layout">
+<div class="card">
+<div id="assignmentInfo" style="font-size:22px;font-weight:900;text-align:center;padding:10px;background:#1f4068;color:#fff;border-radius:8px">請先新增或選擇作業</div>
+<div class="row" style="margin-top:10px"><input id="assignmentStudent" placeholder="同學姓名" style="flex:1"><button onclick="addAssignmentStudent()">👤 新增同學</button></div>
+<table><thead><tr><th>座號</th><th>姓名</th><th>繳交狀態</th><th>管理</th></tr></thead><tbody id="assignmentTable"></tbody></table>
+<button class="danger" style="width:100%;margin-top:12px" onclick="clearAssignments()">🗑️ 清空作業資料</button>
+</div>
+<div class="blackboard"><h3>📌 🪵 未交作業催繳公告 🪵</h3><div id="assignmentStatus" style="text-align:center;border-bottom:2px dashed #ffeb3b;padding-bottom:10px">進度：已收 0 人 / 總共 0 人</div><textarea id="assignmentNotice" readonly></textarea></div>
+</div>
+</div>
+</section>
+
+<section id="group" class="page">
+<iframe id="groupFrame" title="分組工具" style="width:100%;height:calc(100vh - 215px);min-height:640px;border:0;border-radius:18px;box-shadow:var(--shadow);background:#070a1c" allow="autoplay" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-Hant&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;分組工具&lt;/title&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;display=swap&quot;&gt;
+&lt;style&gt;
+:root{color-scheme:dark;--ink:#eef1ff;--muted:#a9b2d6;--line:rgba(255,255,255,.16);--glass:rgba(14,18,50,.58);--field:rgba(255,255,255,.08);--gold:#ffd166;
+--m:#9fd4ff;--m-bg:rgba(124,196,255,.18);--m-line:#7cc4ff;--f:#ffb3d6;--f-bg:rgba(255,142,200,.18);--f-line:#ff8ec8;
+--ok:#8ff0b8;--ok-bg:rgba(60,200,130,.18);--bad:#ffb199;--bad-bg:rgba(255,110,70,.2);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.3) transparent}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:&quot;Noto Sans TC&quot;,&quot;PingFang TC&quot;,&quot;Microsoft JhengHei&quot;,system-ui,sans-serif;line-height:1.5;font-size:15px;
+background:radial-gradient(ellipse at 15% 0%,#2b1d63 0,transparent 55%),radial-gradient(ellipse at 90% 100%,#0e3b63 0,transparent 55%),#070a1c;background-attachment:fixed}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:14px 16px 20px}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+h1{font-size:1.6rem;margin:0;letter-spacing:.08em;background:linear-gradient(90deg,#ffe29a,#ffb3d6 55%,#9fd4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);margin:0;font-size:.9rem}
+h2{font-size:1.05rem;margin:0}
+.layout{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.card{background:var(--glass);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 36px rgba(0,0,0,.4)}
+@media (min-width:900px){
+  html,body{height:100%;overflow:hidden}
+  .wrap{height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;padding-bottom:14px}
+  .layout{flex:1;min-height:0;grid-template-columns:minmax(0,4fr) minmax(0,5fr) minmax(0,5fr);grid-template-rows:minmax(0,1fr)}
+  .card{display:flex;flex-direction:column;min-height:0}
+  .plist{max-height:none;flex:1;min-height:0}
+  .gscroll,.results{flex:1;min-height:0;overflow:auto}
+}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+label.f{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem}
+input[type=number],input[type=text],textarea{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:4px 8px;min-width:0}
+input[type=number]{width:76px;text-align:center}
+input:focus-visible,button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--ink);padding:5px 12px;transition:background .15s}
+button:hover{background:rgba(255,255,255,.16)}
+button.primary{background:linear-gradient(135deg,#ffd166,#ff9a62);color:#2a1500;border-color:transparent;font-weight:700;padding:8px 22px;box-shadow:0 4px 16px rgba(255,170,90,.35)}
+button.primary:hover{filter:brightness(1.08)}
+.plist{max-height:340px;overflow:auto;border-top:1px solid var(--line);padding-top:6px;margin-top:6px}
+.prow{display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;gap:6px;align-items:center;padding:2px 0}
+.no{color:var(--muted);text-align:right;font-size:.8rem}
+.seg{display:inline-flex}
+.seg button{border-radius:0;padding:3px 10px;color:var(--muted)}
+.seg button:first-child{border-radius:8px 0 0 8px}
+.seg button:last-child{border-radius:0 8px 8px 0;border-left:0}
+.seg button.on.m{background:var(--m-bg);color:var(--m);border-color:var(--m-line);font-weight:700}
+.seg button.on.f{background:var(--f-bg);color:var(--f);border-color:var(--f-line);font-weight:700}
+.del{padding:2px 8px;color:var(--muted);line-height:1.3}
+.del:hover{color:var(--bad);border-color:var(--bad)}
+.del:disabled{opacity:.35;cursor:not-allowed}
+.del:disabled:hover{color:var(--muted);border-color:var(--line)}
+.range{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--muted);font-size:.9rem;margin-top:6px}
+.range input{width:58px}
+.range .m{color:var(--m);border-color:var(--m-line)}
+.range .f{color:var(--f);border-color:var(--f-line)}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--muted);font-size:.9rem}
+textarea{width:100%;min-height:70px;margin:6px 0}
+.ghead,.grow{display:grid;grid-template-columns:54px repeat(3,minmax(0,1fr)) 30px;gap:6px;align-items:center}
+.ghead{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:2px}
+.grow{padding:2px 0}
+.grow b{font-weight:500}
+.grow input{width:100%}
+.ghead .m,.grow .mm{color:var(--m)}
+.ghead .f,.grow .ff{color:var(--f)}
+.rules{border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
+.rules h3{margin:0 0 2px;font-size:.95rem}
+.rule{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:2px 0;color:var(--muted);font-size:.9rem}
+.rule input{width:64px}
+.addrule{margin-top:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.chip{padding:1px 10px;border-radius:999px;font-size:.82rem;background:var(--ok-bg);color:var(--ok)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.err{color:var(--bad);background:var(--bad-bg);border-radius:8px;padding:6px 10px;margin-top:8px;display:none;font-size:.88rem}
+.err.show{display:block}
+.results{margin-top:4px;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-content:start}
+.gcard{border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(255,255,255,.05)}
+.gcard h3{margin:0 0 6px;font-size:.95rem;display:flex;justify-content:space-between;gap:6px;align-items:baseline;color:var(--gold)}
+.gcard h3 small{color:var(--muted);font-weight:400;font-size:.75rem}
+.gcard ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.gcard li{padding:2px 8px;border-radius:6px;border-left:4px solid}
+.gcard li.m{background:var(--m-bg);color:#d3ebff;border-color:var(--m-line)}
+.gcard li.f{background:var(--f-bg);color:#ffd9ec;border-color:var(--f-line)}
+.empty{color:var(--muted);margin:8px 0 0;font-size:.92rem}
+[hidden]{display:none!important}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tabs{display:flex;gap:4px;padding:3px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.tabs button{border:0;background:transparent;border-radius:999px;padding:5px 20px;font-size:1.1rem;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.tabs button[aria-selected=true]{background:linear-gradient(135deg,#ffd166,#ff9a62);color:#2a1500;box-shadow:0 3px 14px rgba(255,170,90,.35)}
+select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:4px 8px}
+select option{color:#111}
+.dctl{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin-bottom:4px}
+.chk{cursor:pointer}
+.dres{display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start;padding:18px 0;min-height:120px}
+.dchip{font-size:1.7rem;font-weight:700;padding:10px 24px;border-radius:14px;border:2px solid var(--line)}
+.dchip.roll{opacity:.6;background:rgba(255,255,255,.08)}
+.dchip.m{background:var(--m-bg);color:#d3ebff;border-color:var(--m-line)}
+.dchip.f{background:var(--f-bg);color:#ffd9ec;border-color:var(--f-line)}
+.dchip.fin{box-shadow:0 0 24px rgba(255,209,102,.45);animation:pop .35s ease-out}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.dchip.fin{animation:none}}
+.dh{margin:6px 0 4px;font-size:.95rem;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.dhist{max-height:220px;overflow:auto}
+.drow{padding:3px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+@media (min-width:900px){
+  .layout.draw{grid-template-columns:minmax(0,4fr) minmax(0,10fr)}
+  .dhist{flex:1;min-height:0;max-height:none}
+}
+#fx{position:fixed;inset:0;z-index:5;pointer-events:none}
+.dtitle{font-size:1.25rem;font-weight:700;min-height:1.8em;margin-top:10px;color:var(--gold)}
+.dres{padding:8px 0 14px;min-height:100px}
+.dchip{font-size:2rem;min-width:120px;text-align:center;padding:10px 24px}
+.dchip.roll{filter:blur(.6px);border-style:dashed}
+.dchip.fin::before{content:attr(data-e);margin-right:8px}
+#beams{position:fixed;left:50%;top:50%;width:140vmax;height:140vmax;margin:-70vmax 0 0 -70vmax;z-index:0;pointer-events:none;opacity:0;transition:opacity .6s;
+background:repeating-conic-gradient(from 0deg,rgba(255,220,150,.2) 0 6deg,transparent 6deg 20deg);animation:spinb 9s linear infinite;
+-webkit-mask-image:radial-gradient(circle,#000 0,transparent 60%);mask-image:radial-gradient(circle,#000 0,transparent 60%)}
+body.spinning #beams{opacity:1}
+@keyframes spinb{to{transform:rotate(360deg)}}
+#cd{position:fixed;inset:0;display:grid;place-items:center;z-index:6;pointer-events:none;font-size:34vmin;font-weight:900;color:#fff;text-shadow:0 0 30px #ffd166,0 0 80px #ff8ec8}
+#cd.tick{animation:cdpop .7s ease-out}
+@keyframes cdpop{0%{transform:scale(2.4);opacity:0}25%{transform:scale(1);opacity:1}100%{transform:scale(.8);opacity:0}}
+#flash{position:fixed;inset:0;z-index:6;pointer-events:none;background:#fff;opacity:0}
+#flash.go{animation:flash .7s ease-out}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+.shake{animation:shake .5s}
+@keyframes shake{10%,50%,90%{transform:translate(-5px,2px)}30%,70%{transform:translate(5px,-2px)}}
+.dchip.roll{animation:wob .12s infinite alternate}
+@keyframes wob{from{transform:translateY(-4px) rotate(-1deg)}to{transform:translateY(4px) rotate(1deg)}}
+.dchip.fin{background-image:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);background-size:250% 100%;
+animation:pop .5s cubic-bezier(.2,1.6,.4,1),shine 1.4s .4s 2,glow 1.2s ease-in-out infinite alternate}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+@keyframes glow{from{box-shadow:0 0 14px rgba(255,209,102,.4)}to{box-shadow:0 0 36px rgba(255,209,102,.95)}}
+@media (prefers-reduced-motion:reduce){.dchip.fin,.dchip.roll,.shake{animation:none}#beams{display:none}}
+.fcard{perspective:700px;width:130px;height:84px}
+.fcard .fi{position:relative;width:100%;height:100%;transition:transform .7s;transform-style:preserve-3d}
+.fcard.on .fi{transform:rotateY(180deg)}
+.fcard.shuf{animation:wob .1s infinite alternate}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;border-radius:12px;border:2px solid var(--line);font-weight:700;font-size:1.3rem}
+.face.back{background:linear-gradient(135deg,#3a2a7a,#1d3d73);font-size:2rem}
+.face.front{transform:rotateY(180deg);background:#2a2150}
+.face.front.m{background:var(--m-bg);color:#d3ebff;border-color:var(--m-line)}
+.face.front.f{background:var(--f-bg);color:#ffd9ec;border-color:var(--f-line)}
+.egg{font-size:3.4rem;line-height:1.2;display:inline-block;animation:jig .35s infinite}
+@keyframes jig{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg) translateY(-6px)}}
+.wheelwrap{position:relative;width:320px;margin:0 auto}
+.wheel{display:block;border-radius:50%;box-shadow:0 0 40px rgba(255,209,102,.4)}
+.wptr{position:absolute;left:50%;top:-16px;transform:translateX(-50%);font-size:2rem;color:var(--gold);z-index:2;text-shadow:0 0 10px #000}
+.wout{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px;flex-basis:100%}
+@media (prefers-reduced-motion:reduce){.egg,.fcard.shuf{animation:none}}
+.dmain{display:block}
+@media (min-width:900px){
+  .dmain{display:flex;flex-direction:column;flex:1;min-height:0}
+  .dright{display:flex;flex-direction:column;flex:1;min-height:0}
+}
+.wheelmode .dmain{display:flex;flex-direction:row;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.wheelmode .dleft{flex:0 0 340px;max-width:100%}
+.wheelmode .dright{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}
+.wheelmode .dh{border-top:0;padding-top:0;margin-top:10px}
+@media (min-width:900px){.wheelmode .dmain{flex-wrap:nowrap;align-items:stretch}}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;canvas id=&quot;stars&quot; aria-hidden=&quot;true&quot;&gt;&lt;/canvas&gt;
+&lt;div id=&quot;beams&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+&lt;canvas id=&quot;fx&quot; aria-hidden=&quot;true&quot;&gt;&lt;/canvas&gt;
+&lt;div id=&quot;cd&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;flash&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header class=&quot;top&quot;&gt;&lt;h1 class=&quot;vh&quot;&gt;分組與抽籤工具&lt;/h1&gt;&lt;nav class=&quot;tabs&quot; role=&quot;tablist&quot;&gt;&lt;button type=&quot;button&quot; role=&quot;tab&quot; id=&quot;tGroup&quot; aria-selected=&quot;true&quot;&gt;分組工具&lt;/button&gt;&lt;button type=&quot;button&quot; role=&quot;tab&quot; id=&quot;tDraw&quot; aria-selected=&quot;false&quot;&gt;抽籤工具&lt;/button&gt;&lt;/nav&gt;&lt;p class=&quot;sub&quot; id=&quot;subtitle&quot;&gt;&lt;/p&gt;&lt;/header&gt;
+  &lt;div class=&quot;layout&quot;&gt;
+    &lt;section class=&quot;card&quot; aria-labelledby=&quot;h-people&quot;&gt;
+      &lt;div class=&quot;head&quot;&gt;
+        &lt;h2 id=&quot;h-people&quot;&gt;名單&lt;/h2&gt;
+        &lt;label class=&quot;f&quot;&gt;總人數 &lt;input type=&quot;number&quot; id=&quot;nPeople&quot; min=&quot;1&quot; max=&quot;200&quot; value=&quot;12&quot; inputmode=&quot;numeric&quot;&gt;&lt;/label&gt;
+      &lt;/div&gt;
+      &lt;div id=&quot;pcount&quot; class=&quot;sub&quot; style=&quot;margin:0&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;range&quot;&gt;
+        &lt;span&gt;批次設定：第&lt;/span&gt;&lt;input type=&quot;number&quot; id=&quot;rFrom&quot; min=&quot;1&quot; inputmode=&quot;numeric&quot; aria-label=&quot;起始號碼&quot;&gt;
+        &lt;span&gt;號到第&lt;/span&gt;&lt;input type=&quot;number&quot; id=&quot;rTo&quot; min=&quot;1&quot; inputmode=&quot;numeric&quot; aria-label=&quot;結束號碼&quot;&gt;&lt;span&gt;號&lt;/span&gt;
+        &lt;button type=&quot;button&quot; class=&quot;m&quot; id=&quot;rM&quot;&gt;設為男生&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;f&quot; id=&quot;rF&quot;&gt;設為女生&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;plist&quot; id=&quot;people&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;section class=&quot;card&quot; id=&quot;gCard&quot; aria-labelledby=&quot;h-groups&quot;&gt;
+      &lt;div class=&quot;head&quot;&gt;
+        &lt;h2 id=&quot;h-groups&quot;&gt;分組設定&lt;/h2&gt;
+        &lt;label class=&quot;f&quot;&gt;組數 &lt;input type=&quot;number&quot; id=&quot;nGroups&quot; min=&quot;1&quot; max=&quot;30&quot; value=&quot;3&quot; inputmode=&quot;numeric&quot;&gt;&lt;/label&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;gscroll&quot;&gt;
+      &lt;div class=&quot;ghead&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;人數&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;男生&lt;/span&gt;&lt;span class=&quot;f&quot;&gt;女生&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;div id=&quot;groups&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;rules&quot;&gt;
+        &lt;h3&gt;不能同組的限制&lt;/h3&gt;
+        &lt;div id=&quot;rules&quot;&gt;&lt;/div&gt;
+        &lt;button type=&quot;button&quot; class=&quot;addrule&quot; id=&quot;addRule&quot;&gt;＋ 新增限制&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;chips&quot; id=&quot;chips&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;actions&quot;&gt;
+        &lt;button type=&quot;button&quot; id=&quot;auto&quot;&gt;自動平均分配&lt;/button&gt;
+        &lt;button type=&quot;button&quot; id=&quot;reset&quot;&gt;重設全部&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;primary&quot; id=&quot;go&quot;&gt;開始分組&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;err&quot; id=&quot;err&quot; role=&quot;alert&quot;&gt;&lt;/div&gt;
+    &lt;/section&gt;
+
+  &lt;section class=&quot;card&quot; id=&quot;rCard&quot; aria-labelledby=&quot;h-res&quot;&gt;
+    &lt;div class=&quot;head&quot;&gt;
+      &lt;h2 id=&quot;h-res&quot;&gt;分組結果&lt;/h2&gt;
+      &lt;div class=&quot;actions&quot; style=&quot;margin:0&quot;&gt;
+        &lt;button type=&quot;button&quot; id=&quot;again&quot; hidden&gt;重新抽籤&lt;/button&gt;
+        &lt;button type=&quot;button&quot; id=&quot;copy&quot; hidden&gt;複製結果&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;empty&quot; id=&quot;empty&quot;&gt;設定完成後按「開始分組」，結果會顯示在這裡。&lt;/p&gt;
+    &lt;div class=&quot;results&quot; id=&quot;results&quot;&gt;&lt;/div&gt;
+  &lt;/section&gt;
+
+  &lt;section class=&quot;card&quot; id=&quot;drawCard&quot; aria-labelledby=&quot;h-draw&quot; hidden&gt;
+    &lt;div class=&quot;head&quot;&gt;&lt;h2 id=&quot;h-draw&quot;&gt;抽籤&lt;/h2&gt;&lt;span class=&quot;sub&quot; id=&quot;dRemain&quot;&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;dctl&quot;&gt;
+      &lt;label class=&quot;f&quot;&gt;一次抽出 &lt;input type=&quot;number&quot; id=&quot;dCount&quot; min=&quot;1&quot; max=&quot;200&quot; value=&quot;1&quot; inputmode=&quot;numeric&quot;&gt; 人&lt;/label&gt;
+      &lt;label class=&quot;f&quot;&gt;範圍 &lt;select id=&quot;dGender&quot;&gt;&lt;option value=&quot;all&quot;&gt;全部&lt;/option&gt;&lt;option value=&quot;m&quot;&gt;只抽男生&lt;/option&gt;&lt;option value=&quot;f&quot;&gt;只抽女生&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+      &lt;label class=&quot;f&quot;&gt;玩法 &lt;select id=&quot;dStyle&quot;&gt;&lt;option value=&quot;slot&quot;&gt;🎰 老虎機&lt;/option&gt;&lt;option value=&quot;flip&quot;&gt;🃏 翻牌&lt;/option&gt;&lt;option value=&quot;egg&quot;&gt;🧋 來杯好茶搖一搖&lt;/option&gt;&lt;option value=&quot;wheel&quot;&gt;🎡 轉盤&lt;/option&gt;&lt;/select&gt;&lt;/label&gt;
+      &lt;label class=&quot;f chk&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;dNoRepeat&quot; checked&gt; 已抽過的不再抽&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;actions&quot;&gt;&lt;button type=&quot;button&quot; class=&quot;primary&quot; id=&quot;dGo&quot;&gt;抽籤&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;dReset&quot;&gt;重設已抽&lt;/button&gt;&lt;button type=&quot;button&quot; id=&quot;dSound&quot; aria-pressed=&quot;true&quot;&gt;🔊 音效&lt;/button&gt;&lt;/div&gt;
+    &lt;div class=&quot;err&quot; id=&quot;dMsg&quot; role=&quot;alert&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;dmain&quot; id=&quot;dMain&quot;&gt;
+      &lt;div class=&quot;dleft&quot;&gt;
+        &lt;div class=&quot;dtitle&quot; id=&quot;dTitle&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;dres&quot; id=&quot;dResult&quot; aria-live=&quot;polite&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;dright&quot;&gt;
+        &lt;h3 class=&quot;dh&quot;&gt;抽籤紀錄&lt;/h3&gt;
+        &lt;div class=&quot;dhist&quot; id=&quot;dHist&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const $ = s =&gt; document.querySelector(s);
+let people = [], groups = [], rules = [], result = null, custom = false;
+
+function clampInt(v, min, max){
+  v = parseInt(v, 10);
+  if (isNaN(v)) v = min;
+  return Math.max(min, Math.min(max, v));
+}
+function defName(i){ return (i + 1) + &#x27;號&#x27;; }
+function nameOf(i){ return (people[i].name || &#x27;&#x27;).trim() || defName(i); }
+function countG(g){ return people.filter(p =&gt; p.g === g).length; }
+
+function setPeople(n){
+  while (people.length &lt; n){
+    const i = people.length;
+    people.push({name: defName(i), g: i % 2 ? &#x27;f&#x27; : &#x27;m&#x27;});
+  }
+  people.length = n;
+}
+function setGroups(n){
+  while (groups.length &lt; n) groups.push({size:0, m:0, f:0});
+  groups.length = n;
+}
+
+function autoFill(){
+  custom = false;
+  const N = people.length, M = countG(&#x27;m&#x27;), G = groups.length;
+  let cum = 0;
+  groups.forEach((g, i) =&gt; {
+    const size = Math.floor(N / G) + (i &lt; N % G ? 1 : 0);
+    const a = Math.round(cum * M / N), b = Math.round((cum + size) * M / N);
+    g.size = size; g.m = b - a; g.f = size - g.m;
+    cum += size;
+  });
+}
+
+function renderPeople(){
+  const box = $(&#x27;#people&#x27;);
+  box.textContent = &#x27;&#x27;;
+  people.forEach((p, i) =&gt; {
+    const row = document.createElement(&#x27;div&#x27;);
+    row.className = &#x27;prow&#x27;;
+    const no = document.createElement(&#x27;span&#x27;);
+    no.className = &#x27;no&#x27;; no.textContent = i + 1;
+    const inp = document.createElement(&#x27;input&#x27;);
+    inp.type = &#x27;text&#x27;; inp.value = p.name; inp.dataset.i = i;
+    inp.setAttribute(&#x27;aria-label&#x27;, &#x27;第&#x27; + (i + 1) + &#x27;位姓名&#x27;);
+    const seg = document.createElement(&#x27;div&#x27;);
+    seg.className = &#x27;seg&#x27;; seg.setAttribute(&#x27;role&#x27;, &#x27;group&#x27;);
+    [[&#x27;m&#x27;,&#x27;男&#x27;],[&#x27;f&#x27;,&#x27;女&#x27;]].forEach(([g, t]) =&gt; {
+      const b = document.createElement(&#x27;button&#x27;);
+      b.type = &#x27;button&#x27;; b.textContent = t;
+      b.dataset.i = i; b.dataset.g = g;
+      b.className = g + (p.g === g ? &#x27; on&#x27; : &#x27;&#x27;);
+      b.setAttribute(&#x27;aria-pressed&#x27;, p.g === g);
+      seg.append(b);
+    });
+    const del = document.createElement(&#x27;button&#x27;);
+    del.type = &#x27;button&#x27;; del.className = &#x27;del&#x27;; del.textContent = &#x27;✕&#x27;;
+    del.dataset.del = i;
+    del.setAttribute(&#x27;aria-label&#x27;, &#x27;刪除第&#x27; + (i + 1) + &#x27;位&#x27;);
+    row.append(no, inp, seg, del);
+    box.append(row);
+  });
+  updatePCount();
+}
+function updatePCount(){
+  $(&#x27;#pcount&#x27;).textContent = &#x27;男生 &#x27; + countG(&#x27;m&#x27;) + &#x27; 位，女生 &#x27; + countG(&#x27;f&#x27;) + &#x27; 位&#x27;;
+}
+
+function renderGroups(){
+  const box = $(&#x27;#groups&#x27;);
+  box.textContent = &#x27;&#x27;;
+  groups.forEach((g, i) =&gt; {
+    const row = document.createElement(&#x27;div&#x27;);
+    row.className = &#x27;grow&#x27;;
+    const lab = document.createElement(&#x27;b&#x27;);
+    lab.textContent = &#x27;第&#x27; + (i + 1) + &#x27;組&#x27;;
+    row.append(lab);
+    [[&#x27;size&#x27;,&#x27;人數&#x27;,&#x27;&#x27;],[&#x27;m&#x27;,&#x27;男生&#x27;,&#x27;mm&#x27;],[&#x27;f&#x27;,&#x27;女生&#x27;,&#x27;ff&#x27;]].forEach(([k, t, c]) =&gt; {
+      const inp = document.createElement(&#x27;input&#x27;);
+      inp.type = &#x27;number&#x27;; inp.min = 0; inp.max = 999; inp.inputMode = &#x27;numeric&#x27;;
+      inp.value = g[k]; inp.dataset.i = i; inp.dataset.k = k;
+      inp.setAttribute(&#x27;aria-label&#x27;, &#x27;第&#x27; + (i + 1) + &#x27;組&#x27; + t);
+      if (c) inp.className = c;
+      row.append(inp);
+    });
+    const del = document.createElement(&#x27;button&#x27;);
+    del.type = &#x27;button&#x27;; del.className = &#x27;del&#x27;; del.textContent = &#x27;✕&#x27;;
+    del.dataset.gdel = i; del.disabled = groups.length &lt;= 1;
+    del.setAttribute(&#x27;aria-label&#x27;, &#x27;刪除第&#x27; + (i + 1) + &#x27;組&#x27;);
+    row.append(del);
+    box.append(row);
+  });
+  updateStatus();
+}
+
+function sums(){
+  return {
+    size: groups.reduce((a, g) =&gt; a + g.size, 0),
+    m: groups.reduce((a, g) =&gt; a + g.m, 0),
+    f: groups.reduce((a, g) =&gt; a + g.f, 0)
+  };
+}
+function updateStatus(){
+  const s = sums(), N = people.length, M = countG(&#x27;m&#x27;), F = countG(&#x27;f&#x27;);
+  const items = [[&#x27;總人數&#x27;, s.size, N], [&#x27;男生&#x27;, s.m, M], [&#x27;女生&#x27;, s.f, F]];
+  const box = $(&#x27;#chips&#x27;);
+  box.textContent = &#x27;&#x27;;
+  items.forEach(([t, a, b]) =&gt; {
+    const c = document.createElement(&#x27;span&#x27;);
+    c.className = &#x27;chip&#x27; + (a === b ? &#x27;&#x27; : &#x27; bad&#x27;);
+    c.textContent = t + &#x27;：已分配 &#x27; + a + &#x27; / 名單 &#x27; + b;
+    box.append(c);
+  });
+}
+
+function shuffle(a){
+  a = a.slice();
+  for (let i = a.length - 1; i &gt; 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generate(){
+  const err = $(&#x27;#err&#x27;);
+  const s = sums(), N = people.length, M = countG(&#x27;m&#x27;), F = countG(&#x27;f&#x27;);
+  const msgs = [];
+  if (s.size !== N) msgs.push(&#x27;各組人數合計 &#x27; + s.size + &#x27; 人，但名單有 &#x27; + N + &#x27; 人。&#x27;);
+  if (s.m !== M) msgs.push(&#x27;各組男生合計 &#x27; + s.m + &#x27; 人，但名單有 &#x27; + M + &#x27; 位男生。&#x27;);
+  if (s.f !== F) msgs.push(&#x27;各組女生合計 &#x27; + s.f + &#x27; 人，但名單有 &#x27; + F + &#x27; 位女生。&#x27;);
+  const cons = [];
+  for (const r of rules){
+    if (r.a == null &amp;&amp; r.b == null) continue;
+    if (r.a == null || r.b == null || r.a === r.b || r.a &gt; N || r.b &gt; N){
+      msgs.push(&#x27;不能同組的限制有誤：兩個號碼都要填寫、不能相同，且要在 1 到 &#x27; + N + &#x27; 之間。&#x27;);
+      break;
+    }
+    cons.push([r.a - 1, r.b - 1]);
+  }
+  if (msgs.length){
+    err.textContent = msgs.join(&#x27; &#x27;) + &#x27; 請調整各組人數，或按「自動平均分配」。&#x27;;
+    err.classList.add(&#x27;show&#x27;);
+    return;
+  }
+  err.classList.remove(&#x27;show&#x27;);
+  const mAll = people.map((p, i) =&gt; i).filter(i =&gt; people[i].g === &#x27;m&#x27;);
+  const fAll = people.map((p, i) =&gt; i).filter(i =&gt; people[i].g === &#x27;f&#x27;);
+  let found = null;
+  for (let t = 0; t &lt; 5000 &amp;&amp; !found; t++){
+    const ms = shuffle(mAll), fs = shuffle(fAll);
+    let mi = 0, fi = 0;
+    const where = {};
+    const res = groups.map((g, gi) =&gt; {
+      const mem = ms.slice(mi, mi + g.m).concat(fs.slice(fi, fi + g.f));
+      mi += g.m; fi += g.f;
+      mem.forEach(i =&gt; { where[i] = gi; });
+      return mem;
+    });
+    if (cons.every(([a, b]) =&gt; where[a] !== where[b])) found = res.map(m =&gt; shuffle(m));
+  }
+  if (!found){
+    err.textContent = &#x27;找不到符合「不能同組」的分法，請放寬限制或調整各組人數。&#x27;;
+    err.classList.add(&#x27;show&#x27;);
+    return;
+  }
+  result = found;
+  renderResult();
+}
+
+function renderResult(){
+  const box = $(&#x27;#results&#x27;);
+  box.textContent = &#x27;&#x27;;
+  result.forEach((mem, gi) =&gt; {
+    const card = document.createElement(&#x27;div&#x27;);
+    card.className = &#x27;gcard&#x27;;
+    const h = document.createElement(&#x27;h3&#x27;);
+    const nm = mem.filter(i =&gt; people[i].g === &#x27;m&#x27;).length;
+    h.textContent = &#x27;第&#x27; + (gi + 1) + &#x27;組&#x27;;
+    const sm = document.createElement(&#x27;small&#x27;);
+    sm.textContent = mem.length + &#x27; 人（男 &#x27; + nm + &#x27;，女 &#x27; + (mem.length - nm) + &#x27;）&#x27;;
+    h.append(sm);
+    const ul = document.createElement(&#x27;ul&#x27;);
+    mem.forEach(i =&gt; {
+      const li = document.createElement(&#x27;li&#x27;);
+      li.className = people[i].g;
+      li.textContent = nameOf(i);
+      ul.append(li);
+    });
+    card.append(h, ul);
+    box.append(card);
+  });
+  $(&#x27;#empty&#x27;).hidden = true;
+  $(&#x27;#again&#x27;).hidden = false;
+  $(&#x27;#copy&#x27;).hidden = false;
+}
+
+function copyResult(){
+  if (!result) return;
+  const text = result.map((mem, gi) =&gt; &#x27;第&#x27; + (gi + 1) + &#x27;組：&#x27; + mem.map(nameOf).join(&#x27;、&#x27;)).join(&#x27;\n&#x27;);
+  const done = () =&gt; { const b = $(&#x27;#copy&#x27;); b.textContent = &#x27;已複製&#x27;; setTimeout(() =&gt; b.textContent = &#x27;複製結果&#x27;, 1500); };
+  const fallback = () =&gt; {
+    const t = document.createElement(&#x27;textarea&#x27;);
+    t.value = text; document.body.append(t); t.select();
+    try { document.execCommand(&#x27;copy&#x27;); done(); } catch (e) {}
+    t.remove();
+  };
+  try {
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } catch (e) { fallback(); }
+}
+
+const KEY = &#x27;grouping-tool-v1&#x27;;
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify({people, groups, rules, custom})); } catch (e) {}
+}
+function load(){
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || &#x27;null&#x27;);
+    if (!d || !Array.isArray(d.people) || !d.people.length || !Array.isArray(d.groups) || !d.groups.length) return false;
+    people = d.people.slice(0, 200).map((p, i) =&gt; ({name: String(p &amp;&amp; p.name != null ? p.name : defName(i)), g: p &amp;&amp; p.g === &#x27;f&#x27; ? &#x27;f&#x27; : &#x27;m&#x27;}));
+    groups = d.groups.slice(0, 30).map(g =&gt; ({size: clampInt(g &amp;&amp; g.size, 0, 999), m: clampInt(g &amp;&amp; g.m, 0, 999), f: clampInt(g &amp;&amp; g.f, 0, 999)}));
+    rules = Array.isArray(d.rules) ? d.rules.map(r =&gt; ({a: r &amp;&amp; Number.isInteger(r.a) ? r.a : null, b: r &amp;&amp; Number.isInteger(r.b) ? r.b : null})) : [];
+    custom = !!d.custom;
+    return true;
+  } catch (e) { return false; }
+}
+function afterGender(){
+  if (!custom){ autoFill(); renderGroups(); } else updateStatus();
+  save();
+}
+function removePerson(i){
+  if (people.length &lt;= 1) return;
+  const n = i + 1;
+  people.splice(i, 1);
+  rules = rules.filter(r =&gt; r.a !== n &amp;&amp; r.b !== n)
+    .map(r =&gt; ({a: r.a &gt; n ? r.a - 1 : r.a, b: r.b &gt; n ? r.b - 1 : r.b}));
+  $(&#x27;#nPeople&#x27;).value = people.length;
+  resetDrawn();
+  autoFill(); renderPeople(); renderGroups(); renderRules(); save();
+}
+function setRange(g){
+  const n = people.length, f = $(&#x27;#rFrom&#x27;).value, t = $(&#x27;#rTo&#x27;).value;
+  if (f === &#x27;&#x27;) return;
+  let a = clampInt(f, 1, n), b = t === &#x27;&#x27; ? a : clampInt(t, 1, n);
+  if (a &gt; b) [a, b] = [b, a];
+  for (let i = a - 1; i &lt; b; i++) people[i].g = g;
+  renderPeople(); afterGender();
+}
+function renderRules(){
+  const box = $(&#x27;#rules&#x27;);
+  box.textContent = &#x27;&#x27;;
+  const sp = t =&gt; { const s = document.createElement(&#x27;span&#x27;); s.textContent = t; return s; };
+  if (!rules.length){
+    const p = document.createElement(&#x27;p&#x27;);
+    p.className = &#x27;empty&#x27;; p.style.margin = &#x27;0 0 4px&#x27;;
+    p.textContent = &#x27;尚未設定。按下方的「＋」，指定哪兩個號碼不能分在同一組。&#x27;;
+    box.append(p);
+  }
+  rules.forEach((r, i) =&gt; {
+    const row = document.createElement(&#x27;div&#x27;);
+    row.className = &#x27;rule&#x27;;
+    const mk = k =&gt; {
+      const inp = document.createElement(&#x27;input&#x27;);
+      inp.type = &#x27;number&#x27;; inp.min = 1; inp.inputMode = &#x27;numeric&#x27;;
+      inp.value = r[k] == null ? &#x27;&#x27; : r[k];
+      inp.dataset.i = i; inp.dataset.k = k;
+      inp.setAttribute(&#x27;aria-label&#x27;, &#x27;第&#x27; + (k === &#x27;a&#x27; ? &#x27;一&#x27; : &#x27;二&#x27;) + &#x27;個號碼&#x27;);
+      return inp;
+    };
+    const del = document.createElement(&#x27;button&#x27;);
+    del.type = &#x27;button&#x27;; del.className = &#x27;del&#x27;; del.textContent = &#x27;✕&#x27;;
+    del.dataset.rdel = i;
+    del.setAttribute(&#x27;aria-label&#x27;, &#x27;刪除這條限制&#x27;);
+    row.append(sp(&#x27;第&#x27;), mk(&#x27;a&#x27;), sp(&#x27;號和第&#x27;), mk(&#x27;b&#x27;), sp(&#x27;號不能同組&#x27;), del);
+    box.append(row);
+  });
+}
+
+/* events */
+$(&#x27;#nPeople&#x27;).addEventListener(&#x27;input&#x27;, e =&gt; {
+  if (e.target.value === &#x27;&#x27;) return;
+  setPeople(clampInt(e.target.value, 1, 200));
+  resetDrawn();
+  autoFill(); renderPeople(); renderGroups(); save();
+});
+$(&#x27;#nPeople&#x27;).addEventListener(&#x27;change&#x27;, e =&gt; { e.target.value = people.length; });
+
+$(&#x27;#nGroups&#x27;).addEventListener(&#x27;input&#x27;, e =&gt; {
+  if (e.target.value === &#x27;&#x27;) return;
+  setGroups(clampInt(e.target.value, 1, 30));
+  autoFill(); renderGroups(); save();
+});
+$(&#x27;#nGroups&#x27;).addEventListener(&#x27;change&#x27;, e =&gt; { e.target.value = groups.length; });
+
+$(&#x27;#people&#x27;).addEventListener(&#x27;input&#x27;, e =&gt; {
+  if (e.target.matches(&#x27;input[type=text]&#x27;)){ people[e.target.dataset.i].name = e.target.value; save(); }
+});
+$(&#x27;#people&#x27;).addEventListener(&#x27;click&#x27;, e =&gt; {
+  const b = e.target.closest(&#x27;button&#x27;);
+  if (!b) return;
+  if (b.dataset.del !== undefined){ removePerson(+b.dataset.del); return; }
+  people[b.dataset.i].g = b.dataset.g;
+  const seg = b.parentElement;
+  seg.querySelectorAll(&#x27;button&#x27;).forEach(x =&gt; {
+    const on = x.dataset.g === b.dataset.g;
+    x.className = x.dataset.g + (on ? &#x27; on&#x27; : &#x27;&#x27;);
+    x.setAttribute(&#x27;aria-pressed&#x27;, on);
+  });
+  updatePCount(); afterGender();
+});
+
+$(&#x27;#groups&#x27;).addEventListener(&#x27;input&#x27;, e =&gt; {
+  const t = e.target;
+  if (!t.dataset.k) return;
+  const g = groups[+t.dataset.i], k = t.dataset.k;
+  const v = clampInt(t.value, 0, 999);
+  if (k === &#x27;size&#x27;){ g.size = v; g.m = Math.min(g.m, v); g.f = v - g.m; }
+  else { g[k] = v; g.size = g.m + g.f; }
+  const row = t.closest(&#x27;.grow&#x27;);
+  [&#x27;size&#x27;, &#x27;m&#x27;, &#x27;f&#x27;].forEach(x =&gt; {
+    if (x !== k) row.querySelector(&#x27;[data-k=&quot;&#x27; + x + &#x27;&quot;]&#x27;).value = g[x];
+  });
+  custom = true;
+  updateStatus(); save();
+});
+
+$(&#x27;#groups&#x27;).addEventListener(&#x27;click&#x27;, e =&gt; {
+  const b = e.target.closest(&#x27;button&#x27;);
+  if (!b || b.dataset.gdel === undefined || groups.length &lt;= 1) return;
+  groups.splice(+b.dataset.gdel, 1);
+  $(&#x27;#nGroups&#x27;).value = groups.length;
+  autoFill(); renderGroups(); save();
+});
+$(&#x27;#auto&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; { autoFill(); renderGroups(); $(&#x27;#err&#x27;).classList.remove(&#x27;show&#x27;); save(); });
+$(&#x27;#go&#x27;).addEventListener(&#x27;click&#x27;, generate);
+$(&#x27;#again&#x27;).addEventListener(&#x27;click&#x27;, generate);
+$(&#x27;#copy&#x27;).addEventListener(&#x27;click&#x27;, copyResult);
+
+
+$(&#x27;#rM&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; setRange(&#x27;m&#x27;));
+$(&#x27;#rF&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; setRange(&#x27;f&#x27;));
+
+$(&#x27;#rules&#x27;).addEventListener(&#x27;input&#x27;, e =&gt; {
+  const t = e.target;
+  if (!t.dataset.k) return;
+  rules[+t.dataset.i][t.dataset.k] = t.value === &#x27;&#x27; ? null : clampInt(t.value, 1, 999);
+  save();
+});
+$(&#x27;#rules&#x27;).addEventListener(&#x27;click&#x27;, e =&gt; {
+  const b = e.target.closest(&#x27;button&#x27;);
+  if (!b || b.dataset.rdel === undefined) return;
+  rules.splice(+b.dataset.rdel, 1);
+  renderRules(); save();
+});
+$(&#x27;#addRule&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; {
+  rules.push({a: null, b: null});
+  renderRules(); save();
+  const ins = $(&#x27;#rules&#x27;).querySelectorAll(&#x27;input&#x27;);
+  if (ins.length) ins[ins.length - 2].focus();
+});
+
+$(&#x27;#reset&#x27;).addEventListener(&#x27;click&#x27;, e =&gt; {
+  const b = e.currentTarget;
+  if (!b.dataset.armed){
+    b.dataset.armed = &#x27;1&#x27;; b.textContent = &#x27;再按一次確認重設&#x27;;
+    setTimeout(() =&gt; { delete b.dataset.armed; b.textContent = &#x27;重設全部&#x27;; }, 3000);
+    return;
+  }
+  delete b.dataset.armed; b.textContent = &#x27;重設全部&#x27;;
+  people = []; groups = []; rules = []; result = null;
+  setPeople(12); setGroups(3); autoFill();
+  $(&#x27;#nPeople&#x27;).value = 12; $(&#x27;#nGroups&#x27;).value = 3;
+  $(&#x27;#results&#x27;).textContent = &#x27;&#x27;; $(&#x27;#empty&#x27;).hidden = false;
+  $(&#x27;#again&#x27;).hidden = true; $(&#x27;#copy&#x27;).hidden = true;
+  $(&#x27;#err&#x27;).classList.remove(&#x27;show&#x27;);
+  renderPeople(); renderGroups(); renderRules(); save();
+});
+
+/* lottery */
+let drawn = [], hist = [], busy = false;
+function resetDrawn(){
+  drawn = []; hist = []; gen++; busy = false;
+  document.body.classList.remove(&#x27;spinning&#x27;);
+  if ($(&#x27;#cd&#x27;)) $(&#x27;#cd&#x27;).textContent = &#x27;&#x27;;
+  if ($(&#x27;#dGo&#x27;)) $(&#x27;#dGo&#x27;).disabled = false;
+  if ($(&#x27;#dResult&#x27;)){ $(&#x27;#dResult&#x27;).textContent = &#x27;&#x27;; $(&#x27;#dTitle&#x27;).textContent = &#x27;&#x27;; renderHist(); updateRemain(); }
+}
+function poolList(){
+  const f = $(&#x27;#dGender&#x27;).value;
+  let pool = people.map((p, i) =&gt; i).filter(i =&gt; f === &#x27;all&#x27; || people[i].g === f);
+  if ($(&#x27;#dNoRepeat&#x27;).checked) pool = pool.filter(i =&gt; !drawn.includes(i));
+  return pool;
+}
+function updateRemain(){ $(&#x27;#dRemain&#x27;).textContent = &#x27;目前可抽：&#x27; + poolList().length + &#x27; 人&#x27;; }
+function renderHist(){
+  const box = $(&#x27;#dHist&#x27;);
+  box.textContent = &#x27;&#x27;;
+  if (!hist.length){
+    const p = document.createElement(&#x27;p&#x27;);
+    p.className = &#x27;empty&#x27;; p.textContent = &#x27;還沒有抽過。&#x27;;
+    box.append(p); return;
+  }
+  hist.slice().reverse().forEach(h =&gt; {
+    const r = document.createElement(&#x27;div&#x27;);
+    r.className = &#x27;drow&#x27;;
+    r.textContent = &#x27;第&#x27; + h.n + &#x27;次：&#x27; + h.list.map(nameOf).join(&#x27;、&#x27;);
+    box.append(r);
+  });
+}
+const EMOJI = [&#x27;🎉&#x27;,&#x27;⭐&#x27;,&#x27;🍀&#x27;,&#x27;🎯&#x27;,&#x27;🌟&#x27;,&#x27;🎁&#x27;,&#x27;🦄&#x27;,&#x27;🚀&#x27;];
+const CUPS = [&#x27;🧋&#x27;,&#x27;🥤&#x27;];
+let sound = true, actx = null, gen = 0, parts = [], fxOn = false;
+const fx = $(&#x27;#fx&#x27;), fctx = fx.getContext(&#x27;2d&#x27;);
+function fxSize(){ fx.width = innerWidth; fx.height = innerHeight; }
+fxSize(); addEventListener(&#x27;resize&#x27;, fxSize);
+function beep(f, d, type, vol){
+  if (!sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    o.type = type || &#x27;square&#x27;; o.frequency.value = f;
+    g.gain.setValueAtTime(vol || .04, t);
+    g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t + d);
+  } catch (e) {}
+}
+let sparks = [], rockets = [], rings = [];
+function fxStart(){ if (!fxOn){ fxOn = true; requestAnimationFrame(fxFrame); } }
+function burst(x, y, n){
+  const cols = [&#x27;#ffd166&#x27;, &#x27;#ff8ec8&#x27;, &#x27;#7cc4ff&#x27;, &#x27;#8ff0b8&#x27;, &#x27;#ffffff&#x27;];
+  for (let i = 0; i &lt; n; i++){
+    const a = Math.random() * 6.283, v = Math.random() * 7 + 3;
+    parts.push({x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4, r: Math.random() * 4 + 3, c: cols[i % 5], rot: Math.random() * 6, vr: (Math.random() - .5) * .4, life: 80 + Math.random() * 40});
+  }
+  fxStart();
+}
+function explode(x, y, n){
+  const hue = Math.random() * 360, two = Math.random() &lt; .5;
+  for (let i = 0; i &lt; n; i++){
+    const alt = two &amp;&amp; i % 2, a = Math.random() * 6.283, v = (Math.random() * .6 + .4) * (alt ? 4 : 8);
+    sparks.push({x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 60 + Math.random() * 30, max: 90, c: &#x27;hsl(&#x27; + ((hue + (alt ? 150 : 0) + Math.random() * 30) % 360) + &#x27;,100%,65%)&#x27;, r: Math.random() * 2 + 1.5});
+  }
+  rings.push({x, y, r: 6, life: 30});
+  fxStart();
+}
+function rocket(tx, ty, delay){
+  setTimeout(() =&gt; {
+    rockets.push({x: tx + (Math.random() - .5) * 120, y: innerHeight, ty, vy: -(14 + Math.random() * 4)});
+    fxStart();
+  }, delay || 0);
+}
+function fxFrame(){
+  fctx.globalCompositeOperation = &#x27;destination-out&#x27;;
+  fctx.fillStyle = &#x27;rgba(0,0,0,.28)&#x27;;
+  fctx.fillRect(0, 0, fx.width, fx.height);
+  fctx.globalCompositeOperation = &#x27;lighter&#x27;;
+  rockets = rockets.filter(r =&gt; {
+    r.y += r.vy; r.vy *= .985;
+    sparks.push({x: r.x, y: r.y, vx: (Math.random() - .5) * .8, vy: 1 + Math.random(), life: 18, max: 18, c: &#x27;#ffd9a0&#x27;, r: 1.8});
+    if (r.y &lt;= r.ty || r.vy &gt; -3){ explode(r.x, r.y, 70); return false; }
+    return true;
+  });
+  sparks = sparks.filter(p =&gt; p.life-- &gt; 0);
+  for (const p of sparks){
+    p.x += p.vx; p.y += p.vy; p.vy += .12; p.vx *= .985; p.vy *= .985;
+    fctx.globalAlpha = Math.max(0, p.life / p.max);
+    fctx.fillStyle = p.c; fctx.beginPath(); fctx.arc(p.x, p.y, p.r, 0, 6.283); fctx.fill();
+  }
+  rings = rings.filter(r =&gt; r.life-- &gt; 0);
+  for (const r of rings){
+    r.r += 9; fctx.globalAlpha = r.life / 30; fctx.strokeStyle = &#x27;#ffe9b0&#x27;; fctx.lineWidth = 3;
+    fctx.beginPath(); fctx.arc(r.x, r.y, r.r, 0, 6.283); fctx.stroke();
+  }
+  parts = parts.filter(p =&gt; p.life-- &gt; 0);
+  for (const p of parts){
+    p.x += p.vx; p.y += p.vy; p.vy += .25; p.vx *= .99; p.rot += p.vr;
+    fctx.save(); fctx.translate(p.x, p.y); fctx.rotate(p.rot);
+    fctx.globalAlpha = Math.min(1, p.life / 30); fctx.fillStyle = p.c;
+    fctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); fctx.restore();
+  }
+  fctx.globalAlpha = 1;
+  if (sparks.length || rockets.length || rings.length || parts.length) requestAnimationFrame(fxFrame);
+  else { fxOn = false; fctx.globalCompositeOperation = &#x27;source-over&#x27;; fctx.clearRect(0, 0, fx.width, fx.height); }
+}
+function commit(picks, calm){
+  drawn.push(...picks); hist.push({n: hist.length + 1, list: picks});
+  $(&#x27;#dTitle&#x27;).textContent = &#x27;🎉 恭喜幸運兒！&#x27;;
+  document.body.classList.remove(&#x27;spinning&#x27;);
+  renderHist(); updateRemain();
+  if (!calm) finale();
+  [784, 988, 1175].forEach((f, n) =&gt; setTimeout(() =&gt; beep(f, .25, &#x27;triangle&#x27;, .08), n * 120));
+  busy = false; $(&#x27;#dGo&#x27;).disabled = false;
+}
+function chipFor(i, j){
+  const c = document.createElement(&#x27;span&#x27;);
+  c.className = &#x27;dchip fin &#x27; + people[i].g;
+  c.dataset.e = EMOJI[j % EMOJI.length];
+  c.textContent = nameOf(i);
+  return c;
+}
+function fxAt(el, k, calm){
+  if (calm || k &gt; 12) return;
+  const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  explode(x, y, 45); burst(x, y, 16);
+}
+function altDraw(style, picks, pool, k){
+  const calm = matchMedia(&#x27;(prefers-reduced-motion: reduce)&#x27;).matches;
+  const box = $(&#x27;#dResult&#x27;), my = gen, TAU = 6.283185;
+  box.textContent = &#x27;&#x27;;
+  busy = true; $(&#x27;#dGo&#x27;).disabled = true;
+  const later = (fn, ms) =&gt; setTimeout(() =&gt; { if (my === gen) fn(); }, ms);
+  const gap = calm ? 0 : Math.min(500, 2500 / k);
+  document.body.classList.add(&#x27;spinning&#x27;);
+  if (style === &#x27;flip&#x27; || style === &#x27;egg&#x27;){
+    $(&#x27;#dTitle&#x27;).textContent = style === &#x27;flip&#x27; ? &#x27;🃏 洗牌中…&#x27; : &#x27;🧋 來杯好茶搖一搖…&#x27;;
+    const els = picks.map((_, j) =&gt; {
+      const el = document.createElement(&#x27;div&#x27;);
+      if (style === &#x27;flip&#x27;){
+        el.className = &#x27;fcard shuf&#x27;;
+        el.innerHTML = &#x27;&lt;div class=&quot;fi&quot;&gt;&lt;div class=&quot;face back&quot;&gt;❓&lt;/div&gt;&lt;div class=&quot;face front&quot;&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+      } else { el.className = &#x27;egg&#x27;; el.textContent = CUPS[j % CUPS.length]; }
+      box.append(el); return el;
+    });
+    els.forEach((el, j) =&gt; later(() =&gt; {
+      const i = picks[j];
+      let target = el;
+      if (style === &#x27;flip&#x27;){
+        el.classList.remove(&#x27;shuf&#x27;);
+        const fr = el.querySelector(&#x27;.front&#x27;);
+        fr.className = &#x27;face front &#x27; + people[i].g; fr.textContent = nameOf(i);
+        el.classList.add(&#x27;on&#x27;);
+      } else {
+        target = chipFor(i, j); target.dataset.e = CUPS[j % CUPS.length]; el.replaceWith(target);
+      }
+      beep(520 + (j % 8) * 70, .18, &#x27;triangle&#x27;, .07);
+      fxAt(target, k, calm);
+      if (j === k - 1) later(() =&gt; commit(picks, calm), calm ? 0 : 700);
+    }, (calm ? 0 : 1300) + j * gap));
+    return;
+  }
+  $(&#x27;#dTitle&#x27;).textContent = &#x27;🎡 轉啊轉…&#x27;;
+  const wrap = document.createElement(&#x27;div&#x27;); wrap.className = &#x27;wheelwrap&#x27;;
+  const cv = document.createElement(&#x27;canvas&#x27;); cv.width = cv.height = 320; cv.className = &#x27;wheel&#x27;;
+  const ptr = document.createElement(&#x27;div&#x27;); ptr.className = &#x27;wptr&#x27;; ptr.textContent = &#x27;▼&#x27;;
+  const out = document.createElement(&#x27;div&#x27;); out.className = &#x27;wout&#x27;;
+  wrap.append(ptr, cv); box.append(wrap, out);
+  if (calm){
+    picks.forEach((i, j) =&gt; out.append(chipFor(i, j)));
+    commit(picks, true); return;
+  }
+  const cols = [&#x27;#ff8ec8&#x27;, &#x27;#7cc4ff&#x27;, &#x27;#ffd166&#x27;, &#x27;#8ff0b8&#x27;, &#x27;#c3a6ff&#x27;, &#x27;#ff9a62&#x27;];
+  let left = pool.slice(), rot = 0, round = 0;
+  const paint = () =&gt; {
+    const g = cv.getContext(&#x27;2d&#x27;), n = left.length, a = TAU / n;
+    g.clearRect(0, 0, 320, 320);
+    left.forEach((idx, q) =&gt; {
+      g.beginPath(); g.moveTo(160, 160);
+      g.arc(160, 160, 156, -Math.PI / 2 + q * a - a / 2, -Math.PI / 2 + q * a + a / 2);
+      g.closePath(); g.fillStyle = cols[q % cols.length]; g.fill();
+      g.strokeStyle = &#x27;rgba(255,255,255,.7)&#x27;; g.lineWidth = 1; g.stroke();
+      if (n &lt;= 30){
+        g.save(); g.translate(160, 160); g.rotate(-Math.PI / 2 + q * a);
+        g.fillStyle = &#x27;#1a1030&#x27;; g.font = &#x27;700 &#x27; + (n &gt; 14 ? 11 : 15) + &#x27;px sans-serif&#x27;;
+        g.textAlign = &#x27;right&#x27;; g.textBaseline = &#x27;middle&#x27;;
+        g.fillText(nameOf(idx), 144, 0); g.restore();
+      }
+    });
+  };
+  const spin = () =&gt; {
+    const q = left.indexOf(picks[round]), a = TAU / left.length;
+    const dur = k &lt;= 3 ? 4000 : 2600;
+    const delta = ((TAU - q * a) - (rot % TAU) + TAU) % TAU;
+    const target = rot + TAU * 4 + delta + (Math.random() - .5) * a * .6;
+    cv.style.transition = &#x27;transform &#x27; + dur + &#x27;ms cubic-bezier(.12,.7,.1,1)&#x27;;
+    cv.style.transform = &#x27;rotate(&#x27; + target + &#x27;rad)&#x27;;
+    rot = target;
+    for (let t = 0; t &lt; 22; t++) later(() =&gt; beep(300 + t * 10, .03, &#x27;square&#x27;, .02), dur * Math.pow(t / 22, 1.8));
+    later(() =&gt; {
+      const c = chipFor(picks[round], round);
+      out.append(c);
+      beep(660, .2, &#x27;triangle&#x27;, .08);
+      fxAt(c, k, false);
+      round++;
+      if (round &gt;= k){ later(() =&gt; commit(picks, false), 500); return; }
+      left.splice(q, 1);
+      later(() =&gt; {
+        cv.style.transition = &#x27;none&#x27;; rot = 0; cv.style.transform = &#x27;rotate(0rad)&#x27;; paint();
+        later(spin, 80);
+      }, 700);
+    }, dur + 150);
+  };
+  paint();
+  later(spin, 400);
+}
+function countdown(my, cb){
+  const cd = $(&#x27;#cd&#x27;);
+  let n = 3;
+  (function step(){
+    if (my !== gen){ cd.textContent = &#x27;&#x27;; return; }
+    if (n === 0){ cd.textContent = &#x27;&#x27;; cb(); return; }
+    cd.textContent = n; cd.classList.remove(&#x27;tick&#x27;); void cd.offsetWidth; cd.classList.add(&#x27;tick&#x27;);
+    beep(n === 1 ? 880 : 660, .15, &#x27;square&#x27;, .05);
+    n--; setTimeout(step, 700);
+  })();
+}
+function finale(){
+  const f = $(&#x27;#flash&#x27;); f.classList.remove(&#x27;go&#x27;); void f.offsetWidth; f.classList.add(&#x27;go&#x27;);
+  const c = $(&#x27;#drawCard&#x27;); c.classList.remove(&#x27;shake&#x27;); void c.offsetWidth; c.classList.add(&#x27;shake&#x27;);
+  for (let i = 0; i &lt; 7; i++) rocket(innerWidth * (.12 + .76 * i / 6), innerHeight * (.15 + Math.random() * .3), 150 + i * 160);
+  burst(innerWidth * .5, innerHeight * .3, 90);
+}
+function doDraw(){
+  if (busy) return;
+  const msg = $(&#x27;#dMsg&#x27;);
+  msg.classList.remove(&#x27;show&#x27;);
+  const want = clampInt($(&#x27;#dCount&#x27;).value, 1, 200);
+  const pool = poolList();
+  if (!pool.length){
+    msg.textContent = &#x27;沒有可以抽的人了。可以按「重設已抽」，或取消「已抽過的不再抽」。&#x27;;
+    msg.classList.add(&#x27;show&#x27;); return;
+  }
+  const k = Math.min(want, pool.length);
+  if (k &lt; want){ msg.textContent = &#x27;只剩 &#x27; + k + &#x27; 人可抽，已全部抽出。&#x27;; msg.classList.add(&#x27;show&#x27;); }
+  const picks = shuffle(pool).slice(0, k);
+  let style = $(&#x27;#dStyle&#x27;).value;
+  if (style === &#x27;wheel&#x27; &amp;&amp; k &gt; 8){
+    style = &#x27;slot&#x27;;
+    msg.textContent = &#x27;轉盤一次最多抽 8 人，這次改用老虎機。&#x27;; msg.classList.add(&#x27;show&#x27;);
+  }
+  $(&#x27;#drawCard&#x27;).classList.toggle(&#x27;wheelmode&#x27;, style === &#x27;wheel&#x27;);
+  if (style !== &#x27;slot&#x27;){ altDraw(style, picks, pool, k); return; }
+  const calm = matchMedia(&#x27;(prefers-reduced-motion: reduce)&#x27;).matches;
+  const box = $(&#x27;#dResult&#x27;), btn = $(&#x27;#dGo&#x27;), my = gen;
+  box.textContent = &#x27;&#x27;;
+  $(&#x27;#dTitle&#x27;).textContent = &#x27;🎰 準備好了嗎？&#x27;;
+  const reels = picks.map(() =&gt; {
+    const el = document.createElement(&#x27;span&#x27;);
+    el.className = &#x27;dchip roll&#x27;; el.textContent = &#x27;？&#x27;;
+    box.append(el); return el;
+  });
+  busy = true; btn.disabled = true;
+  const gap = calm ? 0 : Math.min(450, 2500 / k), base = calm ? 0 : 900;
+  let stopped = 0;
+  const land = (el, i, j) =&gt; {
+    el.className = &#x27;dchip fin &#x27; + people[i].g;
+    el.dataset.e = EMOJI[j % EMOJI.length];
+    el.textContent = nameOf(i);
+    beep(520 + (j % 8) * 70, .18, &#x27;triangle&#x27;, .07);
+    if (!calm &amp;&amp; k &lt;= 12){
+      const r = el.getBoundingClientRect();
+      explode(r.left + r.width / 2, r.top + r.height / 2, 45);
+      burst(r.left + r.width / 2, r.top + r.height / 2, 16);
+    }
+    if (++stopped &lt; k) return;
+    drawn.push(...picks); hist.push({n: hist.length + 1, list: picks});
+    $(&#x27;#dTitle&#x27;).textContent = &#x27;🎉 恭喜幸運兒！&#x27;;
+    document.body.classList.remove(&#x27;spinning&#x27;);
+    renderHist(); updateRemain();
+    if (!calm) finale();
+    [784, 988, 1175].forEach((f, n) =&gt; setTimeout(() =&gt; beep(f, .25, &#x27;triangle&#x27;, .08), n * 120));
+    busy = false; btn.disabled = false;
+  };
+  const run = () =&gt; {
+    if (my !== gen) return;
+    $(&#x27;#dTitle&#x27;).textContent = &#x27;🎰 抽籤中…&#x27;;
+    document.body.classList.add(&#x27;spinning&#x27;);
+    reels.forEach((el, j) =&gt; {
+      const stopAt = base + j * gap, t0 = performance.now();
+      (function spin(){
+        if (my !== gen) return;
+        const el_t = performance.now() - t0;
+        if (el_t &gt;= stopAt){ land(el, picks[j], j); return; }
+        el.textContent = nameOf(pool[Math.floor(Math.random() * pool.length)]);
+        if (j === 0) beep(450 + Math.random() * 450, .03, &#x27;square&#x27;, .015);
+        setTimeout(spin, 50 + 150 * Math.pow(el_t / Math.max(stopAt, 1), 2));
+      })();
+    });
+  };
+  if (calm) run(); else countdown(my, run);
+}
+function setMode(m){
+  $(&#x27;#gCard&#x27;).hidden = $(&#x27;#rCard&#x27;).hidden = m !== &#x27;group&#x27;;
+  $(&#x27;#drawCard&#x27;).hidden = m !== &#x27;draw&#x27;;
+  $(&#x27;.layout&#x27;).classList.toggle(&#x27;draw&#x27;, m === &#x27;draw&#x27;);
+  $(&#x27;#tGroup&#x27;).setAttribute(&#x27;aria-selected&#x27;, m === &#x27;group&#x27;);
+  $(&#x27;#tDraw&#x27;).setAttribute(&#x27;aria-selected&#x27;, m === &#x27;draw&#x27;);
+  $(&#x27;#subtitle&#x27;).textContent = m === &#x27;group&#x27;
+    ? &#x27;設定名單與性別，決定每組人數與男女人數，按下按鈕就會隨機分組。&#x27;
+    : &#x27;設定一次要抽出的人數，按下抽籤，就會從名單中隨機抽出。&#x27;;
+  if (m === &#x27;draw&#x27;) updateRemain();
+  try { localStorage.setItem(&#x27;grouping-tool-mode&#x27;, m); } catch (e) {}
+}
+$(&#x27;#tGroup&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; setMode(&#x27;group&#x27;));
+$(&#x27;#tDraw&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; setMode(&#x27;draw&#x27;));
+$(&#x27;#dGo&#x27;).addEventListener(&#x27;click&#x27;, doDraw);
+$(&#x27;#dStyle&#x27;).addEventListener(&#x27;change&#x27;, e =&gt; $(&#x27;#drawCard&#x27;).classList.toggle(&#x27;wheelmode&#x27;, e.target.value === &#x27;wheel&#x27;));
+$(&#x27;#dSound&#x27;).addEventListener(&#x27;click&#x27;, e =&gt; {
+  sound = !sound;
+  e.currentTarget.textContent = sound ? &#x27;🔊 音效&#x27; : &#x27;🔇 靜音&#x27;;
+  e.currentTarget.setAttribute(&#x27;aria-pressed&#x27;, sound);
+});
+$(&#x27;#dReset&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; { resetDrawn(); $(&#x27;#dMsg&#x27;).classList.remove(&#x27;show&#x27;); });
+$(&#x27;#dGender&#x27;).addEventListener(&#x27;change&#x27;, updateRemain);
+$(&#x27;#dNoRepeat&#x27;).addEventListener(&#x27;change&#x27;, updateRemain);
+
+(function(){
+  const c = $(&#x27;#stars&#x27;), x = c.getContext(&#x27;2d&#x27;);
+  const still = matchMedia(&#x27;(prefers-reduced-motion: reduce)&#x27;).matches;
+  let w, h, d, stars = [], sh = null;
+  function size(){
+    d = window.devicePixelRatio || 1;
+    w = c.width = Math.round(innerWidth * d); h = c.height = Math.round(innerHeight * d);
+    c.style.width = innerWidth + &#x27;px&#x27;; c.style.height = innerHeight + &#x27;px&#x27;;
+    const n = Math.min(320, Math.round(innerWidth * innerHeight / 5000));
+    stars = Array.from({length: n}, () =&gt; ({x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.1 + .3) * d, p: Math.random() * 6.3, s: Math.random() * .025 + .005, c: Math.random() &lt; .2 ? &#x27;#ffe9b0&#x27; : (Math.random() &lt; .25 ? &#x27;#bcd8ff&#x27; : &#x27;#fff&#x27;)}));
+  }
+  function frame(){
+    x.clearRect(0, 0, w, h);
+    for (const s of stars){
+      if (!still) s.p += s.s;
+      x.globalAlpha = .3 + .7 * Math.abs(Math.sin(s.p));
+      x.fillStyle = s.c; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill();
+    }
+    if (still) return;
+    if (!sh &amp;&amp; Math.random() &lt; .004) sh = {x: Math.random() * w * .7, y: Math.random() * h * .35, t: 0};
+    if (sh){
+      const len = 140 * d, px = sh.x + sh.t * 10 * d, py = sh.y + sh.t * 5 * d;
+      const g = x.createLinearGradient(px, py, px - len, py - len / 2);
+      g.addColorStop(0, &#x27;rgba(255,255,255,.9)&#x27;); g.addColorStop(1, &#x27;rgba(255,255,255,0)&#x27;);
+      x.globalAlpha = 1; x.strokeStyle = g; x.lineWidth = 1.5 * d;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px - len, py - len / 2); x.stroke();
+      if (++sh.t &gt; 60) sh = null;
+    }
+    requestAnimationFrame(frame);
+  }
+  size(); frame();
+  addEventListener(&#x27;resize&#x27;, () =&gt; { size(); if (still) frame(); });
+})();
+
+/* init */
+if (load()){
+  $(&#x27;#nPeople&#x27;).value = people.length;
+  $(&#x27;#nGroups&#x27;).value = groups.length;
+} else {
+  setPeople(12); setGroups(3); autoFill();
+}
+renderPeople(); renderGroups(); renderRules(); renderHist();
+let mode = &#x27;group&#x27;;
+try { mode = localStorage.getItem(&#x27;grouping-tool-mode&#x27;) === &#x27;draw&#x27; ? &#x27;draw&#x27; : &#x27;group&#x27;; } catch (e) {}
+setMode(mode);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+<div class="card" style="margin-top:14px;text-align:center">
+  <a href="https://hihimax77.github.io/random-tool/" target="_blank" rel="noopener" style="display:inline-block;background:var(--primary);color:#fff;font-weight:800;text-decoration:none;padding:12px 26px;border-radius:10px">🌐 前往分組工具網站</a>
+  <div class="muted" style="margin-top:8px">https://hihimax77.github.io/random-tool/</div>
+</div>
+</section>
+
+<section id="links" class="page">
+<div class="card"><h2>🔗 快速連結</h2>
+<p class="muted" style="margin-top:0">按「＋」可以自行新增連結，資料會存在這台電腦的瀏覽器。</p>
+<div id="linkGrid" class="grid"></div>
+<div id="linkForm" class="row" style="display:none;margin-top:16px">
+<input id="linkName" placeholder="連結名稱，例如：Google 雲端硬碟" style="flex:1;min-width:180px">
+<input id="linkUrl" placeholder="網址，例如：https://drive.google.com" style="flex:2;min-width:220px">
+<button class="success" onclick="addLink()">✔ 加入</button>
+<button class="gray" onclick="toggleLinkForm(false)">取消</button>
+</div>
+<div class="row" style="margin-top:15px"><button class="gray" onclick="resetLinks()">↩️ 恢復預設連結</button></div>
+</div>
+</section>
+</main>
+</div>
+
+<script>
+const KEY={
+  school:"teachingTools_schoolData_v2", timetable:"teachingTools_timetable_v2",
+  assignment:"teachingTools_assignment_v2", page:"teachingTools_lastPage"
+};
+function load(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}}
+let schoolData=load(KEY.school,{});
+let timetables=load(KEY.timetable,{});
+let assignmentData=load(KEY.assignment,{list:[],notes:{}});
+let timerSeconds=0,timerInterval=null,alarmInterval=null,timerRunning=false;
+let currentAssignmentId="";
+
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function syncClasses(){
+  const names=new Set([...Object.keys(schoolData),...Object.keys(timetables)]);
+  names.forEach(n=>{if(!schoolData[n])schoolData[n]=[];if(!timetables[n])timetables[n]={rows:[],cells:{}}});
+  save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();
+}
+function refreshClassSelects(){
+  const ids=["studentClassSelect","ttClassSelect"];
+  ids.forEach(id=>{
+    const s=document.getElementById(id),cur=s.value;
+    s.innerHTML='<option value="">-- 請選擇班級 --</option>';
+    Object.keys(schoolData).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;s.appendChild(o)});
+    if(schoolData[cur])s.value=cur;
+  });
+}
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-"+id).classList.add("active");
+  const titles={home:"🏠 教學工具整合版",timer:"⏱️ 計時器",students:"🎒 學生管理及抽籤",timetable:"📅 課表",exam:"🔔 考試",assignment:"📚 作業",group:"👥 分組工具",links:"🔗 快速連結"};
+  const pt=document.getElementById("pageTitle");if(pt)pt.textContent=titles[id];localStorage.setItem(KEY.page,id);
+}
+function addClass(){
+  const n=document.getElementById("classInput").value.trim();if(!n)return;
+  if(!schoolData[n])schoolData[n]=[];
+  if(!timetables[n])timetables[n]={rows:[],cells:{}};
+  save(KEY.school,schoolData);save(KEY.timetable,timetables);
+  document.getElementById("classInput").value="";refreshClassSelects();
+  document.getElementById("studentClassSelect").value=n;document.getElementById("ttClassSelect").value=n;
+  renderStudents();drawTimetable();
+}
+function addStudent(){
+  const c=document.getElementById("studentClassSelect").value,n=document.getElementById("studentInput").value.trim();
+  if(!c||!n)return;schoolData[c].push({name:n,score:0});save(KEY.school,schoolData);
+  document.getElementById("studentInput").value="";renderStudents();
+}
+function renderStudents(){
+  const c=document.getElementById("studentClassSelect").value,t=document.getElementById("studentTable");t.innerHTML="";
+  if(!c||!schoolData[c])return;
+  schoolData[c].forEach((s,i)=>{
+    const tr=document.createElement("tr");tr.innerHTML=`<td>${esc(c)}</td><td>${esc(s.name)}</td><td><b>${s.score}</b> 分</td><td>
+    <button class="success" onclick="changeScore(${i},1)">👍 +1</button>
+    <button class="danger" onclick="changeScore(${i},-1)">👎 -1</button>
+    <button class="gray" onclick="deleteStudent(${i})">❌</button></td>`;t.appendChild(tr)
+  });
+}
+function changeScore(i,p){const c=document.getElementById("studentClassSelect").value;if(!c)return;schoolData[c][i].score+=p;save(KEY.school,schoolData);renderStudents()}
+function deleteStudent(i){const c=document.getElementById("studentClassSelect").value;if(!c)return;schoolData[c].splice(i,1);save(KEY.school,schoolData);renderStudents()}
+function startLottery(){
+  const c=document.getElementById("studentClassSelect").value,arr=schoolData[c]||[];if(!arr.length)return;
+  const out=document.getElementById("luckyName"),btn=event?.target;let n=0;
+  if(btn)btn.disabled=true;const x=setInterval(()=>{out.textContent="✨ "+arr[Math.floor(Math.random()*arr.length)].name+" ✨";if(++n>15){clearInterval(x);if(btn)btn.disabled=false;out.textContent="🎉 【 "+arr[Math.floor(Math.random()*arr.length)].name+" 】 🎉"}},60)
+}
+function exportStudents(){
+ let csv="\uFEFF班級名稱,學生姓名,得分加總\n";Object.entries(schoolData).forEach(([c,a])=>a.forEach(s=>csv+=`${csvCell(c)},${csvCell(s.name)},${s.score}\n`));download(csv,"班級學生加扣分紀錄表.csv")
+}
+function importStudents(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^\uFEFF/,"").split(/\r?\n/);schoolData={};
+ lines.slice(1).forEach(line=>{if(!line.trim())return;const x=parseCSVLine(line);if(x.length>=3){const c=x[0].trim(),n=x[1].trim(),s=parseInt(x[2])||0;(schoolData[c]??=[]).push({name:n,score:s})}});
+ syncClasses();refreshClassSelects();const first=Object.keys(schoolData)[0];if(first){document.getElementById("studentClassSelect").value=first;document.getElementById("ttClassSelect").value=first;renderStudents();drawTimetable()}e.target.value=""};r.readAsText(f,"UTF-8")
+}
+function clearStudents(){if(!confirm("確定清空所有班級與學生資料？"))return;schoolData={};timetables={};save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();document.getElementById("studentTable").innerHTML=""}
+
+function addTimetableClass(){
+  const input=document.getElementById("ttClassInput");
+  const n=input.value.trim();
+  if(!n){alert("請輸入班級名稱");return}
+  if(schoolData[n]){
+    alert("這個班級已經存在");
+    input.focus();
+    return;
+  }
+  schoolData[n]=[];
+  if(!timetables[n])timetables[n]={rows:[],cells:{}};
+  save(KEY.school,schoolData);
+  save(KEY.timetable,timetables);
+  syncClasses();
+  refreshClassSelects();
+  document.getElementById("studentClassSelect").value=n;
+  document.getElementById("ttClassSelect").value=n;
+  input.value="";
+  renderStudents();
+  drawTimetable();
+}
+
+function addTimetableRow(){
+ const c=document.getElementById("ttClassSelect").value;if(!c){alert("請先選擇班級");return}
+ const name=document.getElementById("ttLesson").value.trim(),st=document.getElementById("ttStart").value.trim(),en=document.getElementById("ttEnd").value.trim();if(!name)return;
+ const id="row_"+Date.now();timetables[c].rows.push({id,name,time:(st||en)?`${st} ~ ${en}`:"-"});save(KEY.timetable,timetables);
+ ["ttLesson","ttStart","ttEnd"].forEach(x=>document.getElementById(x).value="");drawTimetable()
+}
+function drawTimetable(){
+ const c=document.getElementById("ttClassSelect").value,t=document.getElementById("ttBody");t.innerHTML="";if(!c||!timetables[c])return;
+ const d=timetables[c];if(!d.rows.length){t.innerHTML='<tr><td colspan="8" class="muted">目前沒有課堂</td></tr>';return}
+ d.rows.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><b>${esc(r.name)}</b></td><td>${esc(r.time)}</td>`;
+ for(let j=1;j<=5;j++){const id=r.id+"_"+j;tr.innerHTML+=`<td><input value="${escAttr(d.cells[id]||"")}" oninput="saveCell('${id}',this.value)" style="width:100%;text-align:center"></td>`}
+ tr.innerHTML+=`<td><button class="danger" onclick="deleteRow('${r.id}')">❌</button></td>`;t.appendChild(tr)})
+}
+function saveCell(id,v){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c].cells[id]=v;save(KEY.timetable,timetables)}
+function deleteRow(id){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c].rows=timetables[c].rows.filter(r=>r.id!==id);for(let j=1;j<=5;j++)delete timetables[c].cells[id+"_"+j];save(KEY.timetable,timetables);drawTimetable()}
+function clearCurrentTimetable(){const c=document.getElementById("ttClassSelect").value;if(!c)return;timetables[c]={rows:[],cells:{}};save(KEY.timetable,timetables);drawTimetable()}
+function exportTimetable(){
+ const c=document.getElementById("ttClassSelect").value;if(!c)return;const d=timetables[c];let csv="\uFEFF班級名稱,節次名稱,上課時間,週一,週二,週三,週四,週五\n";
+ d.rows.forEach(r=>{let line=[c,r.name,r.time];for(let j=1;j<=5;j++)line.push(d.cells[r.id+"_"+j]||"");csv+=line.map(csvCell).join(",")+"\n"});download(csv,c+"_課表備份.csv")
+}
+function importTimetable(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const lines=r.result.replace(/^\uFEFF/,"").split(/\r?\n/);let first="";
+ lines.slice(1).forEach((line,i)=>{if(!line.trim())return;const x=parseCSVLine(line);if(x.length<8)return;const c=x[0].trim(),name=x[1].trim(),time=x[2].trim();if(!c)return;if(!schoolData[c])schoolData[c]=[];if(!timetables[c])timetables[c]={rows:[],cells:{}};if(!first)first=c;let row=timetables[c].rows.find(z=>z.name===name&&z.time===time);if(!row){row={id:"row_"+Date.now()+"_"+i,name,time};timetables[c].rows.push(row)}for(let j=1;j<=5;j++)if(x[j+2])timetables[c].cells[row.id+"_"+j]=x[j+2].trim()});
+ save(KEY.school,schoolData);save(KEY.timetable,timetables);refreshClassSelects();if(first){document.getElementById("ttClassSelect").value=first;document.getElementById("studentClassSelect").value=first}drawTimetable();renderStudents();e.target.value=""};r.readAsText(f,"UTF-8")
+}
+
+function setQuickTime(m){pauseTimer();stopAlarm();timerSeconds=m*60;updateTimerView()}
+function setCustomTime(){pauseTimer();stopAlarm();timerSeconds=(+document.getElementById("th").value||0)*3600+(+document.getElementById("tm").value||0)*60+(+document.getElementById("ts").value||0);updateTimerView()}
+function toggleTimer(){timerRunning?pauseTimer():startTimer()}
+function startTimer(){if(timerSeconds<=0){alert("請先設定時間！");return}stopAlarm();timerRunning=true;document.getElementById("timerStart").textContent="暫停";timerInterval=setInterval(()=>{if(timerSeconds<=0){pauseTimer();document.getElementById("timerDisplay").textContent="時間到！";startAlarm();}else{timerSeconds--;updateTimerView()}},1000)}
+function pauseTimer(){timerRunning=false;clearInterval(timerInterval);document.getElementById("timerStart").textContent="開始"}
+function resetTimer(){pauseTimer();stopAlarm();timerSeconds=0;["th","tm","ts"].forEach(x=>document.getElementById(x).value=0);updateTimerView()}
+function updateTimerView(){const h=Math.floor(timerSeconds/3600),m=Math.floor(timerSeconds%3600/60),s=timerSeconds%60;document.getElementById("timerDisplay").textContent=[h,m,s].map(x=>String(x).padStart(2,"0")).join(":")}
+function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.35;o.start();g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.2);o.stop(c.currentTime+.2)}catch(e){}}
+function startAlarm(){beep();setTimeout(beep,250);alarmInterval=setInterval(()=>{beep();setTimeout(beep,250)},1200)}
+function stopAlarm(){if(alarmInterval){clearInterval(alarmInterval);alarmInterval=null}}
+
+
+function addAssignment(){
+ const c=document.getElementById("assignmentClass").value.trim(),n=document.getElementById("assignmentName").value.trim();if(!c||!n){alert("請輸入班級與作業名稱");return}
+ const id="as_"+Date.now();assignmentData.list.push({id,class:c,name:n,students:[]});assignmentData.notes[id]="";save(KEY.assignment,assignmentData);document.getElementById("assignmentClass").value="";document.getElementById("assignmentName").value="";refreshAssignments();document.getElementById("assignmentSelect").value=id;changeAssignment()
+}
+function refreshAssignments(){const s=document.getElementById("assignmentSelect"),cur=s.value;s.innerHTML='<option value="">-- 請選擇作業項目 --</option>';assignmentData.list.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent="【"+a.class+"】"+a.name;s.appendChild(o)});if(assignmentData.list.some(a=>a.id===cur))s.value=cur}
+function changeAssignment(){currentAssignmentId=document.getElementById("assignmentSelect").value;const a=assignmentData.list.find(x=>x.id===currentAssignmentId);if(!a){document.getElementById("assignmentInfo").textContent="請先新增或選擇作業";document.getElementById("assignmentTable").innerHTML="";document.getElementById("assignmentStatus").textContent="進度：已收 0 人 / 總共 0 人";document.getElementById("assignmentNotice").value="";return}document.getElementById("assignmentInfo").textContent="📋 "+a.class+" － "+a.name;drawAssignment()}
+function addAssignmentStudent(){if(!currentAssignmentId){alert("請先選擇作業項目");return}const n=document.getElementById("assignmentStudent").value.trim();if(!n)return;assignmentData.list.find(x=>x.id===currentAssignmentId).students.push({name:n,status:"未交"});document.getElementById("assignmentStudent").value="";save(KEY.assignment,assignmentData);drawAssignment()}
+function drawAssignment(){const a=assignmentData.list.find(x=>x.id===currentAssignmentId),t=document.getElementById("assignmentTable");t.innerHTML="";if(!a)return;let got=0,un=[];a.students.forEach((s,i)=>{if(s.status==="已交")got++;else un.push((i+1)+"號 "+s.name);const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td>${esc(s.name)}</td><td><span class="badge ${s.status==="已交"?"yes":"no"}" onclick="toggleAssignment(${i})">${s.status}</span></td><td><button class="danger" onclick="deleteAssignmentStudent(${i})">❌</button></td>`;t.appendChild(tr)});document.getElementById("assignmentStatus").textContent=`進度：已收 ${got} 人 / 總共 ${a.students.length} 人`;document.getElementById("assignmentNotice").value="🚨【未交名單公告】🚨\n"+(un.length?`以下 ${un.length} 位同學尚未繳交：\n📌 ${un.join("、 ")}`:"🎉 全班皆已繳交完畢！")}
+function toggleAssignment(i){const a=assignmentData.list.find(x=>x.id===currentAssignmentId);a.students[i].status=a.students[i].status==="已交"?"未交":"已交";save(KEY.assignment,assignmentData);drawAssignment()}
+function deleteAssignmentStudent(i){const a=assignmentData.list.find(x=>x.id===currentAssignmentId);a.students.splice(i,1);save(KEY.assignment,assignmentData);drawAssignment()}
+function clearAssignments(){if(!confirm("確定清空所有作業資料？"))return;assignmentData={list:[],notes:{}};save(KEY.assignment,assignmentData);refreshAssignments();changeAssignment()}
+
+function csvCell(v){return `"${String(v??"").replace(/"/g,'""')}"`}
+function parseCSVLine(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===","&&!q){out.push(cur);cur=""}else cur+=ch}out.push(cur);return out}
+function download(text,name){const b=new Blob([text],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function escAttr(s){return esc(s)}
+
+window.addEventListener("storage",()=>{schoolData=load(KEY.school,{});timetables=load(KEY.timetable,{});syncClasses();renderStudents();drawTimetable()});
+
+syncClasses();refreshAssignments();updateTimerView();
+const last=localStorage.getItem(KEY.page)||"home";showPage(document.getElementById(last)?last:"home");
+if(Object.keys(schoolData).length){const first=Object.keys(schoolData)[0];document.getElementById("studentClassSelect").value=first;document.getElementById("ttClassSelect").value=first;renderStudents();drawTimetable()}
+
+
+const DEFAULT_LINKS=[
+ {name:"Canva",url:"https://www.canva.com/zh_tw/"},
+ {name:"YouTube",url:"https://www.youtube.com/"},
+ {name:"教育部辭典簡編本",url:"https://dict.concised.moe.edu.tw/index.jsp"}
+];
+let quickLinks=load("teachingTools_links_v2",null);
+if(!Array.isArray(quickLinks))quickLinks=DEFAULT_LINKS.map(x=>({...x}));
+function saveLinks(){save("teachingTools_links_v2",quickLinks)}
+function normalizeUrl(u){
+  u=u.trim();if(!u)return"";
+  if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u="https://"+u;
+  try{const x=new URL(u);return(x.protocol==="http:"||x.protocol==="https:")?x.href:""}catch(e){return""}
+}
+function renderLinks(){
+  const g=document.getElementById("linkGrid");g.innerHTML="";
+  quickLinks.forEach((l,i)=>{
+    const d=document.createElement("div");d.className="card tool-card";d.style.position="relative";
+    d.innerHTML=`<a href="${escAttr(l.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:block">🔗 <b>${esc(l.name)}</b><div class="muted" style="word-break:break-all">${esc(l.url)}</div></a><button class="danger" style="position:absolute;top:8px;right:8px;padding:3px 8px" title="刪除" onclick="deleteLink(${i})">❌</button>`;
+    g.appendChild(d)
+  });
+  const p=document.createElement("div");p.className="card tool-card";p.title="新增連結";
+  p.style.cssText="display:flex;align-items:center;justify-content:center;min-height:90px;font-size:44px;font-weight:900;color:var(--primary);border:2px dashed var(--primary)";
+  p.textContent="＋";p.onclick=()=>toggleLinkForm(true);g.appendChild(p)
+}
+function toggleLinkForm(show){
+  document.getElementById("linkForm").style.display=show?"flex":"none";
+  if(show)document.getElementById("linkName").focus();
+  else{document.getElementById("linkName").value="";document.getElementById("linkUrl").value=""}
+}
+function addLink(){
+  const n=document.getElementById("linkName").value.trim(),u=normalizeUrl(document.getElementById("linkUrl").value);
+  if(!u){alert("請輸入有效的網址（http 或 https）");return}
+  quickLinks.push({name:n||u,url:u});saveLinks();
+  toggleLinkForm(false);renderLinks()
+}
+function deleteLink(i){if(!confirm("確定刪除「"+quickLinks[i].name+"」？"))return;quickLinks.splice(i,1);saveLinks();renderLinks()}
+function resetLinks(){if(!confirm("確定恢復成預設連結？自訂的連結會被清除。"))return;quickLinks=DEFAULT_LINKS.map(x=>({...x}));saveLinks();renderLinks()}
+renderLinks();
+
+function toggleSidebar(){
+  const a=document.querySelector(".app");a.classList.toggle("collapsed");
+  try{localStorage.setItem("teachingTools_sidebar",a.classList.contains("collapsed")?"1":"0")}catch(e){}
+}
+try{if(localStorage.getItem("teachingTools_sidebar")==="1")document.querySelector(".app").classList.add("collapsed")}catch(e){}
+</script>
+</body>
+</html>
